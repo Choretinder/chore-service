@@ -17,14 +17,8 @@
  */
 package app.jjerrell.choretender.service
 
-import androidx.room.Room
-import androidx.sqlite.SQLiteException
-import androidx.sqlite.driver.bundled.BundledSQLiteDriver
-import app.jjerrell.choretender.service.database.ChoreServiceDatabase
-import app.jjerrell.choretender.service.database.entity.UserEntity
-import app.jjerrell.choretender.service.database.entity.UserType
 import app.jjerrell.choretender.service.di.appModule
-import io.ktor.http.*
+import app.jjerrell.choretender.service.route.testRoutes
 import io.ktor.serialization.kotlinx.json.*
 import io.ktor.server.application.*
 import io.ktor.server.engine.*
@@ -32,9 +26,7 @@ import io.ktor.server.netty.*
 import io.ktor.server.plugins.contentnegotiation.*
 import io.ktor.server.response.*
 import io.ktor.server.routing.*
-import kotlinx.coroutines.Dispatchers
 import kotlinx.serialization.json.Json
-import org.koin.ktor.ext.inject
 import org.koin.ktor.plugin.Koin
 import org.koin.logger.slf4jLogger
 
@@ -44,38 +36,26 @@ fun main() {
 }
 
 fun Application.module() {
+    setupPlugins()
+
+    routing {
+        testRoutes()
+        get("/") { call.respondText("Ktor: ${Greeting().greet()}") }
+    }
+}
+
+private fun Application.setupPlugins() {
     install(ContentNegotiation) {
-        json(Json {
-            prettyPrint = true
-            isLenient = true
-        })
+        json(
+            Json {
+                prettyPrint = true
+                isLenient = true
+            }
+        )
     }
 
     install(Koin) {
         slf4jLogger()
         modules(appModule)
-    }
-
-    val db by inject<ChoreServiceDatabase>()
-
-    routing { get("/") { call.respondText("Ktor: ${Greeting().greet()}") } }
-    routing {
-        get("/test/user") {
-            try {
-                db.userDao().insertUser(
-                    user = UserEntity(
-                        id = 1,
-                        name = "Jay",
-                        type = UserType.MANAGER
-                    )
-                )
-
-                call.respond(db.userDao().getAllUsers())
-            } catch (e: SQLiteException) {
-                call.respondText(status = HttpStatusCode.Conflict, text = e.message.orEmpty())
-            } catch (e: Throwable) {
-                call.respond(HttpStatusCode.InternalServerError, message = "An unknown error occurred.")
-            }
-        }
     }
 }
