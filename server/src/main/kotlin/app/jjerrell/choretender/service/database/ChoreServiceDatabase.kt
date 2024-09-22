@@ -25,7 +25,7 @@ import app.jjerrell.choretender.service.database.dao.UserDao
 import app.jjerrell.choretender.service.database.entity.UserEntity
 import kotlinx.coroutines.Dispatchers
 
-@Database(entities = [UserEntity::class], version = 1)
+@Database(entities = [UserEntity::class], version = 2)
 abstract class ChoreServiceDatabase : RoomDatabase() {
     abstract fun userDao(): UserDao
 }
@@ -35,5 +35,6 @@ object ChoreDatabaseBuilder {
         Room.databaseBuilder<ChoreServiceDatabase>(name = "chore-service")
             .setDriver(BundledSQLiteDriver())
             .setQueryCoroutineContext(Dispatchers.IO)
+            .fallbackToDestructiveMigration(dropAllTables = true)
             .build()
 }

@@ -22,13 +22,15 @@ import app.jjerrell.choretender.service.database.entity.UserEntity
 
 @Dao
 interface UserDao {
-    @Insert(onConflict = OnConflictStrategy.ABORT) suspend fun insertUser(user: UserEntity)
+    @Insert(onConflict = OnConflictStrategy.ABORT) suspend fun insertUser(user: UserEntity): Long
 
-    @Update suspend fun updateUser(category: UserEntity)
+    @Update suspend fun updateUser(user: UserEntity)
 
     @Query("SELECT * FROM userEntity") suspend fun getAllUsers(): List<UserEntity>
 
-    @Query("SELECT * FROM userEntity WHERE id = :id") suspend fun getUserById(id: Int): UserEntity
+    @Query("SELECT * FROM userEntity WHERE id = :id") suspend fun getUserById(id: Long): UserEntity
 
-    @Query("DELETE FROM userEntity WHERE id = :id") suspend fun deleteUserById(id: Int)
+    @Query("DELETE FROM userEntity WHERE id = :id") suspend fun deleteUserById(id: Long)
+
+    @Query("DELETE FROM userEntity") suspend fun clearTable()
 }

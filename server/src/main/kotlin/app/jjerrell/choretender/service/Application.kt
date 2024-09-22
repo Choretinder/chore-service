@@ -18,7 +18,8 @@
 package app.jjerrell.choretender.service
 
 import app.jjerrell.choretender.service.di.appModule
-import app.jjerrell.choretender.service.route.testRoutes
+import app.jjerrell.choretender.service.domain.repositoryModule
+import app.jjerrell.choretender.service.route.userRoutes
 import io.ktor.serialization.kotlinx.json.*
 import io.ktor.server.application.*
 import io.ktor.server.engine.*
@@ -39,7 +40,7 @@ fun Application.module() {
     setupPlugins()
 
     routing {
-        testRoutes()
+        userRoutes()
         get("/") { call.respondText("Ktor: ${Greeting().greet()}") }
     }
 }
@@ -56,6 +57,8 @@ private fun Application.setupPlugins() {
 
     install(Koin) {
         slf4jLogger()
-        modules(appModule)
+        modules(appModule + repositoryModule)
     }
+
+    install(IgnoreTrailingSlash)
 }

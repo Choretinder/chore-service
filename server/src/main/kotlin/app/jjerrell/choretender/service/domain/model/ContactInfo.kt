@@ -15,26 +15,14 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-package app.jjerrell.choretender.service.database.entity
+package app.jjerrell.choretender.service.domain.model
 
-import androidx.room.Embedded
-import androidx.room.Entity
-import androidx.room.PrimaryKey
+import kotlinx.serialization.Serializable
 
-@Entity
-data class UserEntity(
-    @PrimaryKey(autoGenerate = true) val id: Long = 0,
-    val name: String,
-    val userType: String,
-    @Embedded val contact: UserEntityContact?,
-    val createdBy: Long,
-    val createdDateSeconds: Long,
-    val updatedDateSeconds: Long?,
-    val updatedBy: Long?
-)
+enum class ContactType {
+    PHONE,
+    EMAIL
+}
 
-data class UserEntityContact(
-    val resource: String,
-    val contactType: String,
-    val isVerified: Boolean
-)
+@Serializable
+data class ContactInfo(val resource: String, val type: ContactType, val isVerified: Boolean)

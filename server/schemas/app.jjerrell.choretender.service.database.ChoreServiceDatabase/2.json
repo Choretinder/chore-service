@@ -1,0 +1,80 @@
+{
+  "formatVersion": 1,
+  "database": {
+    "version": 2,
+    "identityHash": "d648b27246f1bc74ebbe4e7965de7b9f",
+    "entities": [
+      {
+        "tableName": "UserEntity",
+        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`id` INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL, `name` TEXT NOT NULL, `userType` TEXT NOT NULL, `createdBy` INTEGER NOT NULL, `createdDateSeconds` INTEGER NOT NULL, `updatedDateSeconds` INTEGER, `updatedBy` INTEGER, `resource` TEXT, `contactType` TEXT, `isVerified` INTEGER)",
+        "fields": [
+          {
+            "fieldPath": "id",
+            "columnName": "id",
+            "affinity": "INTEGER",
+            "notNull": true
+          },
+          {
+            "fieldPath": "name",
+            "columnName": "name",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "userType",
+            "columnName": "userType",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "createdBy",
+            "columnName": "createdBy",
+            "affinity": "INTEGER",
+            "notNull": true
+          },
+          {
+            "fieldPath": "createdDateSeconds",
+            "columnName": "createdDateSeconds",
+            "affinity": "INTEGER",
+            "notNull": true
+          },
+          {
+            "fieldPath": "updatedDateSeconds",
+            "columnName": "updatedDateSeconds",
+            "affinity": "INTEGER"
+          },
+          {
+            "fieldPath": "updatedBy",
+            "columnName": "updatedBy",
+            "affinity": "INTEGER"
+          },
+          {
+            "fieldPath": "contact.resource",
+            "columnName": "resource",
+            "affinity": "TEXT"
+          },
+          {
+            "fieldPath": "contact.contactType",
+            "columnName": "contactType",
+            "affinity": "TEXT"
+          },
+          {
+            "fieldPath": "contact.isVerified",
+            "columnName": "isVerified",
+            "affinity": "INTEGER"
+          }
+        ],
+        "primaryKey": {
+          "autoGenerate": true,
+          "columnNames": [
+            "id"
+          ]
+        }
+      }
+    ],
+    "setupQueries": [
+      "CREATE TABLE IF NOT EXISTS room_master_table (id INTEGER PRIMARY KEY,identity_hash TEXT)",
+      "INSERT OR REPLACE INTO room_master_table (id,identity_hash) VALUES(42, 'd648b27246f1bc74ebbe4e7965de7b9f')"
+    ]
+  }
+}

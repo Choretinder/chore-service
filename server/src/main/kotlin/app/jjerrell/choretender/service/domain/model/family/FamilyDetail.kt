@@ -15,26 +15,24 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-package app.jjerrell.choretender.service.database.entity
+package app.jjerrell.choretender.service.domain.model.family
 
-import androidx.room.Embedded
-import androidx.room.Entity
-import androidx.room.PrimaryKey
+import app.jjerrell.choretender.service.domain.model.user.FamilyMemberDetail
 
-@Entity
-data class UserEntity(
-    @PrimaryKey(autoGenerate = true) val id: Long = 0,
-    val name: String,
-    val userType: String,
-    @Embedded val contact: UserEntityContact?,
-    val createdBy: Long,
-    val createdDateSeconds: Long,
-    val updatedDateSeconds: Long?,
-    val updatedBy: Long?
-)
+sealed interface FamilyDetail {
+    val id: Int?
+    val name: String
+}
 
-data class UserEntityContact(
-    val resource: String,
-    val contactType: String,
-    val isVerified: Boolean
-)
+data class FamilyDetailCreate(
+    override val id: Int? = null,
+    override val name: String,
+    val creator: FamilyMemberDetail,
+    val invitees: List<FamilyMemberDetail>? = null
+) : FamilyDetail
+
+data class FamilyDetailRead(
+    override val id: Int,
+    override val name: String,
+    val members: List<FamilyMemberDetail>
+) : FamilyDetail

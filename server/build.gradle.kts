@@ -21,6 +21,7 @@ dependencies {
     // Ktor Core
     implementation(libs.ktor.server.core)
     implementation(libs.ktor.server.netty)
+    implementation(libs.ktor.utils)
     implementation(libs.logback)
 
     // Auth & Sessions
@@ -41,6 +42,9 @@ dependencies {
     implementation(libs.room.sqlite.core)
     implementation(libs.room.sqlite.bundled)
     ksp(libs.room.compiler)
+
+    // KotlinX
+    implementation(libs.kotlinx.datetime)
 
     // Testing
     testImplementation(libs.ktor.server.tests)
