@@ -36,7 +36,7 @@ internal class UserRepository(private val db: ChoreServiceDatabase, private val 
         return try {
             db.userDao().getUserById(id).toReadUser()
         } catch (e: Throwable) {
-            null
+            throw e
         }
     }
 
@@ -57,16 +57,22 @@ internal class UserRepository(private val db: ChoreServiceDatabase, private val 
                     .copy(
                         name = detail.name,
                         userType = detail.type.name,
-                        contact = detail.contactInfo?.toContactEntity(),
                         updatedDateSeconds = detail.updatedDate ?: Clock.System.now().epochSeconds,
                         updatedBy = detail.updatedBy
                     )
+                    .let {
+                        if (detail.contactInfo != null) {
+                            it.copy(contact = detail.contactInfo.toContactEntity())
+                        } else {
+                            it
+                        }
+                    }
             // operation
             db.userDao().updateUser(user = targetUserUpdate)
             // return value
             db.userDao().getUserById(targetUserUpdate.id).toReadUser()
         } catch (e: Throwable) {
-            null
+            throw e
         }
     }
 }

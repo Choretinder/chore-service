@@ -22,7 +22,6 @@ import app.jjerrell.choretender.service.domain.model.user.UserDetailCreate
 import app.jjerrell.choretender.service.domain.model.user.UserDetailUpdate
 import io.ktor.http.*
 import io.ktor.server.application.*
-import io.ktor.server.engine.*
 import io.ktor.server.request.*
 import io.ktor.server.response.*
 import io.ktor.server.routing.*
@@ -35,16 +34,13 @@ internal fun Routing.userRoutes() {
     route("user") {
         get("{id?}") {
             call.parameters["id"]?.toLongOrNull()?.let {
-                call.application.environment.log.debug("Looking for user with ID: $it")
                 val userLookup = userRepository.getUserDetail(it)
                 if (userLookup == null) {
-                    call.application.environment.log.debug("Failed to locate user with ID: $it")
                     call.respond(
                         HttpStatusCode.NotFound,
                         "Could not locate a user with the ID: $it"
                     )
                 } else {
-                    call.application.environment.log.debug("Located user with ID: $it")
                     call.respond(userLookup)
                 }
             }
@@ -53,20 +49,10 @@ internal fun Routing.userRoutes() {
         post {
             try {
                 val userCreateBody = call.receive<UserDetailCreate>()
-                call.application.environment.log.debug(
-                    "Parsed requset body to create user with name: ${userCreateBody.name}"
-                )
                 val createdUser = async { userRepository.createUser(userCreateBody) }.await()
-                call.application.environment.log.debug("Created user with ID: ${createdUser?.id}")
                 if (createdUser == null) {
-                    call.application.environment.log.debug(
-                        "Failed to locate created user named: ${userCreateBody.name}"
-                    )
                     call.respond(HttpStatusCode.NotFound)
                 } else {
-                    call.application.environment.log.debug(
-                        "Located created user with ID: ${createdUser.id}"
-                    )
                     call.respond(createdUser)
                 }
             } catch (e: ContentTransformationException) {
@@ -90,7 +76,10 @@ internal fun Routing.userRoutes() {
             } catch (e: ContentTransformationException) {
                 call.respond(HttpStatusCode.BadRequest)
             } catch (e: Throwable) {
-                call.respond(HttpStatusCode.InternalServerError)
+                call.respond(
+                    HttpStatusCode.InternalServerError,
+                    "Unexpected Failure.\n${e.stackTraceToString()}"
+                )
             }
         }
     }
