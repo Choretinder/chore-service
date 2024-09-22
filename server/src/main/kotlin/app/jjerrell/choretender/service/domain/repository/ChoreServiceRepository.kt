@@ -21,8 +21,9 @@ import app.jjerrell.choretender.service.domain.model.chore.ChoreDetailCreate
 import app.jjerrell.choretender.service.domain.model.chore.ChoreDetailRead
 import app.jjerrell.choretender.service.domain.model.chore.ChoreDetailUpdate
 import app.jjerrell.choretender.service.domain.model.family.FamilyDetailCreate
+import app.jjerrell.choretender.service.domain.model.family.FamilyDetailInvite
+import app.jjerrell.choretender.service.domain.model.family.FamilyDetailLeave
 import app.jjerrell.choretender.service.domain.model.family.FamilyDetailRead
-import app.jjerrell.choretender.service.domain.model.user.FamilyMemberDetail
 import app.jjerrell.choretender.service.domain.model.user.UserDetailCreate
 import app.jjerrell.choretender.service.domain.model.user.UserDetailRead
 import app.jjerrell.choretender.service.domain.model.user.UserDetailUpdate
@@ -30,11 +31,11 @@ import app.jjerrell.choretender.service.domain.model.user.UserDetailUpdate
 interface IChoreServiceFamilyRepository {
     suspend fun getFamilyDetail(id: Long): FamilyDetailRead?
 
-    suspend fun createFamily(detail: FamilyDetailCreate)
+    suspend fun createFamily(detail: FamilyDetailCreate): FamilyDetailRead?
 
-    suspend fun inviteFamilyMember(familyId: Long, detail: FamilyMemberDetail)
+    suspend fun inviteFamilyMember(detail: FamilyDetailInvite): FamilyDetailRead?
 
-    suspend fun leaveFamilyGroup(familyId: Long, userId: Long)
+    suspend fun leaveFamilyGroup(detail: FamilyDetailLeave): FamilyDetailRead?
 }
 
 interface IChoreServiceUserRepository {
@@ -46,9 +47,9 @@ interface IChoreServiceUserRepository {
 }
 
 interface IChoreServiceChoreRepository {
-    suspend fun getChoreDetail(id: Long): ChoreDetailRead
+    suspend fun getChoreDetail(id: Long): ChoreDetailRead?
 
-    suspend fun createChore(detail: ChoreDetailCreate)
+    suspend fun createChore(detail: ChoreDetailCreate): ChoreDetailRead?
 
-    suspend fun updateChore(detail: ChoreDetailUpdate)
+    suspend fun updateChore(detail: ChoreDetailUpdate): ChoreDetailRead?
 }

@@ -17,6 +17,7 @@
  */
 package app.jjerrell.choretender.service.domain
 
+import app.jjerrell.choretender.service.domain.repository.FamilyRepository
 import app.jjerrell.choretender.service.domain.repository.UserRepository
 import io.ktor.util.logging.*
 import org.koin.dsl.module
@@ -25,7 +26,9 @@ private class RepositoryLogger : Logger by KtorSimpleLogger("RepositoryLogger")
 
 val repositoryModule = module {
     single<Logger> { RepositoryLogger() }
-    factory<IChoreServiceFamilyRepository> { TODO("Create Family Repository") }
     factory<IChoreServiceUserRepository> { UserRepository(db = get(), logger = get()) }
+    factory<IChoreServiceFamilyRepository> {
+        FamilyRepository(db = get(), userRepository = get(), logger = get())
+    }
     factory<IChoreServiceChoreRepository> { TODO("Create Chore Repository") }
 }

@@ -68,8 +68,11 @@ data class UserDetailUpdate(
 @Serializable
 data class FamilyMemberDetail(
     override val id: Long,
+    val memberId: Long,
     override val name: String,
     override val type: UserType,
     override val contactInfo: ContactInfo?,
+    val invitedBy: Long,
+    val invitedDate: Long,
     val isVerified: Boolean
 ) : UserDetail, IIdentifiable

@@ -17,9 +17,10 @@
  */
 package app.jjerrell.choretender.service.route
 
-import app.jjerrell.choretender.service.domain.IChoreServiceUserRepository
-import app.jjerrell.choretender.service.domain.model.user.UserDetailCreate
-import app.jjerrell.choretender.service.domain.model.user.UserDetailUpdate
+import app.jjerrell.choretender.service.domain.IChoreServiceFamilyRepository
+import app.jjerrell.choretender.service.domain.model.family.FamilyDetailCreate
+import app.jjerrell.choretender.service.domain.model.family.FamilyDetailInvite
+import app.jjerrell.choretender.service.domain.model.family.FamilyDetailLeave
 import io.ktor.http.*
 import io.ktor.server.application.*
 import io.ktor.server.request.*
@@ -28,25 +29,25 @@ import io.ktor.server.routing.*
 import kotlinx.coroutines.async
 import org.koin.ktor.ext.inject
 
-internal fun Routing.userRoutes() {
-    val userRepository by inject<IChoreServiceUserRepository>()
+internal fun Routing.familyRoutes() {
+    val familyRepository by inject<IChoreServiceFamilyRepository>()
 
-    route("user") {
+    route("family") {
         get("{id?}") {
             try {
                 call.parameters["id"]?.toLongOrNull()?.let {
-                    val userLookup = userRepository.getUserDetail(it)
-                    if (userLookup == null) {
+                    val familyLookup = familyRepository.getFamilyDetail(it)
+                    if (familyLookup == null) {
                         call.respond(
                             HttpStatusCode.NotFound,
-                            "Could not locate a user with the ID: $it"
+                            "Could not locate a family with the ID: $it"
                         )
                     } else {
-                        call.respond(userLookup)
+                        call.respond(familyLookup)
                     }
                 }
                     ?: run {
-                        call.respond(HttpStatusCode.BadRequest, "Missing or invalid User ID.")
+                        call.respond(HttpStatusCode.BadRequest, "Missing or invalid family ID.")
                     }
             } catch (e: Throwable) {
                 call.respond(
@@ -57,12 +58,13 @@ internal fun Routing.userRoutes() {
         }
         post {
             try {
-                val userCreateBody = call.receive<UserDetailCreate>()
-                val createdUser = async { userRepository.createUser(userCreateBody) }.await()
-                if (createdUser == null) {
+                val familyCreateBody = call.receive<FamilyDetailCreate>()
+                val createdFamily =
+                    async { familyRepository.createFamily(familyCreateBody) }.await()
+                if (createdFamily == null) {
                     call.respond(HttpStatusCode.NotFound)
                 } else {
-                    call.respond(createdUser)
+                    call.respond(createdFamily)
                 }
             } catch (e: ContentTransformationException) {
                 call.respond(HttpStatusCode.BadRequest)
@@ -73,14 +75,32 @@ internal fun Routing.userRoutes() {
                 )
             }
         }
-        put {
+        post("invite") {
             try {
-                val userUpdateBody = call.receive<UserDetailUpdate>()
-                val updatedUser = userRepository.updateUser(userUpdateBody)
-                if (updatedUser == null) {
+                val familyInviteBody = call.receive<FamilyDetailInvite>()
+                val updatedFamily = familyRepository.inviteFamilyMember(familyInviteBody)
+                if (updatedFamily == null) {
                     call.respond(HttpStatusCode.NotFound)
                 } else {
-                    call.respond(updatedUser)
+                    call.respond(updatedFamily)
+                }
+            } catch (e: ContentTransformationException) {
+                call.respond(HttpStatusCode.BadRequest)
+            } catch (e: Throwable) {
+                call.respond(
+                    HttpStatusCode.InternalServerError,
+                    "Unexpected Failure.\n${e.stackTraceToString()}"
+                )
+            }
+        }
+        post("leave") {
+            try {
+                val familyLeaveBody = call.receive<FamilyDetailLeave>()
+                val updatedFamily = familyRepository.leaveFamilyGroup(familyLeaveBody)
+                if (updatedFamily == null) {
+                    call.respond(HttpStatusCode.NotFound)
+                } else {
+                    call.respond(updatedFamily)
                 }
             } catch (e: ContentTransformationException) {
                 call.respond(HttpStatusCode.BadRequest)
