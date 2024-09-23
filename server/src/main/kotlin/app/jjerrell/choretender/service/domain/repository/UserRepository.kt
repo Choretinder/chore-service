@@ -70,7 +70,7 @@ internal class UserRepository(private val db: ChoreServiceDatabase, private val 
             // operation
             db.userDao().updateUser(user = targetUserUpdate)
             // return value
-            db.userDao().getUserById(targetUserUpdate.id).toReadUser()
+            db.userDao().getUserById(targetUserUpdate.userId).toReadUser()
         } catch (e: Throwable) {
             throw e
         }
@@ -80,7 +80,7 @@ internal class UserRepository(private val db: ChoreServiceDatabase, private val 
 // region Read User
 private fun UserEntity.toReadUser(): UserDetailRead =
     UserDetailRead(
-        id = id,
+        id = userId,
         name = name,
         type = UserType.valueOf(userType),
         contactInfo = contact?.toContactDetail(),

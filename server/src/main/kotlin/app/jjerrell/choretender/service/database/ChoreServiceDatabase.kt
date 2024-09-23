@@ -25,7 +25,7 @@ import app.jjerrell.choretender.service.database.dao.UserDao
 import app.jjerrell.choretender.service.database.entity.UserEntity
 import kotlinx.coroutines.Dispatchers
 
-@Database(entities = [UserEntity::class], version = 2)
+@Database(entities = [UserEntity::class], version = 3)
 abstract class ChoreServiceDatabase : RoomDatabase() {
     abstract fun userDao(): UserDao
 }
