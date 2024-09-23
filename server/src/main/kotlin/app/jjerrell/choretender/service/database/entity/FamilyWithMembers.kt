@@ -18,23 +18,10 @@
 package app.jjerrell.choretender.service.database.entity
 
 import androidx.room.Embedded
-import androidx.room.Entity
-import androidx.room.PrimaryKey
+import androidx.room.Relation
 
-@Entity
-data class UserEntity(
-    @PrimaryKey(autoGenerate = true) val userId: Long = 0,
-    val name: String,
-    val userType: String,
-    @Embedded("contact_") val contact: UserEntityContact?,
-    val createdBy: Long,
-    val createdDateSeconds: Long,
-    val updatedDateSeconds: Long?,
-    val updatedBy: Long?
-)
-
-data class UserEntityContact(
-    val resource: String,
-    val contactType: String,
-    val isVerified: Boolean
+data class FamilyWithMembers(
+    @Embedded val family: FamilyEntity,
+    @Relation(parentColumn = "familyId", entityColumn = "familyId")
+    val members: List<FamilyMemberEntity>
 )

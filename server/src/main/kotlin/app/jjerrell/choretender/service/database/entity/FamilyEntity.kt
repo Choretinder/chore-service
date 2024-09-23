@@ -17,24 +17,31 @@
  */
 package app.jjerrell.choretender.service.database.entity
 
-import androidx.room.Embedded
-import androidx.room.Entity
-import androidx.room.PrimaryKey
+import androidx.room.*
 
-@Entity
-data class UserEntity(
-    @PrimaryKey(autoGenerate = true) val userId: Long = 0,
-    val name: String,
-    val userType: String,
-    @Embedded("contact_") val contact: UserEntityContact?,
-    val createdBy: Long,
-    val createdDateSeconds: Long,
-    val updatedDateSeconds: Long?,
-    val updatedBy: Long?
+// FamilyEntity represents a family
+@Entity(tableName = "family")
+data class FamilyEntity(
+    @PrimaryKey(autoGenerate = true) val familyId: Long = 0,
+    val familyName: String
 )
 
-data class UserEntityContact(
-    val resource: String,
-    val contactType: String,
-    val isVerified: Boolean
+@Entity(
+    tableName = "family_member",
+    foreignKeys =
+        [
+            ForeignKey(
+                entity = FamilyEntity::class,
+                parentColumns = ["familyId"],
+                childColumns = ["familyId"],
+                onDelete = ForeignKey.CASCADE
+            )
+        ],
+    indices = [Index(value = ["familyId"])]
+)
+data class FamilyMemberEntity(
+    @PrimaryKey(autoGenerate = true) val memberId: Long = 0,
+    val familyId: Long,
+    @Embedded val user: UserEntity,
+    val role: String
 )
