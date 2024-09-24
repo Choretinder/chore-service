@@ -50,9 +50,9 @@ data class FamilyDetailRead(
 
 @Serializable
 data class FamilyDetailInvite(
-    override val id: Long,
+    val familyId: Long,
     val inviteeId: Long,
     val invitedBy: Long,
-) : IIdentifiable
+)
 
-@Serializable data class FamilyDetailLeave(override val id: Long, val userId: Long) : IIdentifiable
+@Serializable data class FamilyDetailLeave(val familyId: Long, val memberId: Long)

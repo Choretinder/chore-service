@@ -98,7 +98,21 @@ internal class FamilyRepository(
 
     override suspend fun inviteFamilyMember(detail: FamilyDetailInvite): FamilyDetailRead? {
         return try {
-            throw NotImplementedError("Not yet implemented")
+            val foundInvitee = db.userDao().getUserById(detail.inviteeId)
+            // Insert the invitee if located
+            db.familyDao()
+                .insertFamilyMember(
+                    FamilyMemberEntity(
+                        familyId = detail.familyId,
+                        user = foundInvitee,
+                        role = UserType.STANDARD.name,
+                        isConfirmed = false,
+                        invitedBy = detail.invitedBy,
+                        invitedDate = Clock.System.now().epochSeconds
+                    )
+                )
+            // Get the family detail
+            db.familyDao().getFamilyWithMembers(detail.familyId).toFamilyDetail()
         } catch (e: Throwable) {
             throw e
         }
@@ -106,13 +120,24 @@ internal class FamilyRepository(
 
     override suspend fun leaveFamilyGroup(detail: FamilyDetailLeave): FamilyDetailRead? {
         return try {
-            throw NotImplementedError("Not yet implemented")
+            val foundMember =
+                db.familyDao().getFamilyWithMembers(detail.familyId).members.firstOrNull {
+                    it.memberId == detail.memberId
+                }
+            foundMember?.let {
+                // Remove the family member
+                db.familyDao().removeFamilyMember(it)
+                // Return the updated family
+                db.familyDao().getFamilyWithMembers(detail.familyId).toFamilyDetail()
+            }
+                ?: run { throw NotFoundException("Member not found") }
         } catch (e: Throwable) {
             throw e
         }
     }
 }
 
+// region Conversion
 private fun FamilyWithMembers.toFamilyDetail(): FamilyDetailRead {
     val membersInviteesPair = members.partition { it.isConfirmed }
     return FamilyDetailRead(
@@ -138,3 +163,4 @@ private fun FamilyMemberEntity.toMemberDetail() =
         invitedDate = invitedDate,
         isConfirmed = isConfirmed
     )
+// endregion
