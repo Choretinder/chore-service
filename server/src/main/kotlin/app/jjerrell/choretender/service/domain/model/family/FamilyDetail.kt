@@ -31,7 +31,7 @@ sealed interface FamilyDetail {
 @Serializable
 data class FamilyDetailCreate(
     override val name: String,
-    val invitees: List<FamilyMemberDetail>? = null,
+    val invitees: List<Long>? = null,
     override val createdBy: Long,
     override val createdDate: Long = Clock.System.now().epochSeconds
 ) : FamilyDetail, ICreatable

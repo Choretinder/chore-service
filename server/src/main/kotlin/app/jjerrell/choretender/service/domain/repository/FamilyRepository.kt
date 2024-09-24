@@ -18,6 +18,7 @@
 package app.jjerrell.choretender.service.domain.repository
 
 import app.jjerrell.choretender.service.database.ChoreServiceDatabase
+import app.jjerrell.choretender.service.database.entity.FamilyEntity
 import app.jjerrell.choretender.service.database.entity.FamilyMemberEntity
 import app.jjerrell.choretender.service.database.entity.FamilyWithMembers
 import app.jjerrell.choretender.service.domain.IChoreServiceFamilyRepository
@@ -28,7 +29,9 @@ import app.jjerrell.choretender.service.domain.model.family.FamilyDetailLeave
 import app.jjerrell.choretender.service.domain.model.family.FamilyDetailRead
 import app.jjerrell.choretender.service.domain.model.user.FamilyMemberDetail
 import app.jjerrell.choretender.service.domain.model.user.UserType
+import io.ktor.server.plugins.*
 import io.ktor.util.logging.*
+import kotlinx.datetime.Clock
 
 internal class FamilyRepository(
     private val db: ChoreServiceDatabase,
@@ -37,9 +40,7 @@ internal class FamilyRepository(
 ) : IChoreServiceFamilyRepository {
     override suspend fun getFamilyDetail(id: Long): FamilyDetailRead? {
         return try {
-            db.familyDao()
-                .getFamilyWithMembers(familyId = id)
-                .toFamilyDetail()
+            db.familyDao().getFamilyWithMembers(familyId = id).toFamilyDetail()
         } catch (e: Throwable) {
             throw e
         }
@@ -47,7 +48,49 @@ internal class FamilyRepository(
 
     override suspend fun createFamily(detail: FamilyDetailCreate): FamilyDetailRead? {
         return try {
-            throw NotImplementedError("Not yet implemented")
+            val user = db.userDao().getUserById(detail.createdBy)
+            // Create the family
+            val familyEntity =
+                FamilyEntity(
+                    familyName = detail.name,
+                    createdBy = detail.createdBy,
+                    createdDate = detail.createdDate,
+                    updatedBy = null,
+                    updatedDate = null
+                )
+            val familyId = db.familyDao().insertFamily(familyEntity)
+            // Insert creator as the original member
+            db.familyDao()
+                .insertFamilyMember(
+                    FamilyMemberEntity(
+                        familyId = familyId,
+                        user = user,
+                        role = UserType.MANAGER.name,
+                        isConfirmed = true,
+                        invitedBy = 0,
+                        invitedDate = Clock.System.now().epochSeconds
+                    )
+                )
+            // Insert any invitees
+            detail.invitees
+                ?.takeUnless { it.isEmpty() }
+                ?.forEach {
+                    val inviteeEntity = db.userDao().getUserById(it)
+                    db.familyDao()
+                        .insertFamilyMember(
+                            FamilyMemberEntity(
+                                familyId = familyId,
+                                user = inviteeEntity,
+                                role = UserType.STANDARD.name,
+                                isConfirmed = false,
+                                invitedBy = user.userId,
+                                invitedDate = Clock.System.now().epochSeconds
+                            )
+                        )
+                }
+
+            // Get the family detail
+            db.familyDao().getFamilyWithMembers(familyId).toFamilyDetail()
         } catch (e: Throwable) {
             throw e
         }
@@ -84,13 +127,14 @@ private fun FamilyWithMembers.toFamilyDetail(): FamilyDetailRead {
     )
 }
 
-private fun FamilyMemberEntity.toMemberDetail() = FamilyMemberDetail(
-    id = user.userId,
-    memberId = memberId,
-    name = user.name,
-    type = UserType.valueOf(user.userType),
-    contactInfo = user.contact?.toContactDetail(),
-    invitedBy = invitedBy,
-    invitedDate = invitedDate,
-    isConfirmed = isConfirmed
-)
+private fun FamilyMemberEntity.toMemberDetail() =
+    FamilyMemberDetail(
+        id = user.userId,
+        memberId = memberId,
+        name = user.name,
+        type = UserType.valueOf(user.userType),
+        contactInfo = user.contact?.toContactDetail(),
+        invitedBy = invitedBy,
+        invitedDate = invitedDate,
+        isConfirmed = isConfirmed
+    )
