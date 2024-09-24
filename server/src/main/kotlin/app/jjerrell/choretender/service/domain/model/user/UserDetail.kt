@@ -74,5 +74,5 @@ data class FamilyMemberDetail(
     override val contactInfo: ContactInfo?,
     val invitedBy: Long,
     val invitedDate: Long,
-    val isVerified: Boolean
+    val isConfirmed: Boolean
 ) : UserDetail, IIdentifiable

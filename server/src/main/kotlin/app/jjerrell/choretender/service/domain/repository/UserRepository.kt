@@ -105,13 +105,13 @@ private fun UserDetailCreate.toEntityUser(): UserEntity =
 // endregion
 
 // region Contact Info
-private fun UserEntityContact.toContactDetail() =
+internal fun UserEntityContact.toContactDetail() =
     ContactInfo(
         resource = resource,
         type = ContactType.valueOf(contactType),
         isVerified = isVerified
     )
 
-private fun ContactInfo.toContactEntity() =
+internal fun ContactInfo.toContactEntity() =
     UserEntityContact(resource = resource, contactType = type.name, isVerified = isVerified)
 // endregion

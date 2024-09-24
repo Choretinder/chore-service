@@ -23,7 +23,11 @@ import androidx.room.*
 @Entity(tableName = "family")
 data class FamilyEntity(
     @PrimaryKey(autoGenerate = true) val familyId: Long = 0,
-    val familyName: String
+    val familyName: String,
+    val createdBy: Long,
+    val createdDate: Long,
+    val updatedBy: Long,
+    val updatedDate: Long,
 )
 
 @Entity(
@@ -43,5 +47,8 @@ data class FamilyMemberEntity(
     @PrimaryKey(autoGenerate = true) val memberId: Long = 0,
     val familyId: Long,
     @Embedded val user: UserEntity,
-    val role: String
+    val role: String,
+    val isConfirmed: Boolean,
+    val invitedBy: Long,
+    val invitedDate: Long
 )

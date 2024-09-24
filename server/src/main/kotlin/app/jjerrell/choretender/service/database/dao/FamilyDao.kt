@@ -31,6 +31,9 @@ interface FamilyDao {
     @Insert(onConflict = OnConflictStrategy.REPLACE)
     suspend fun insertFamilyMember(familyMember: FamilyMemberEntity): Long
 
+    @Delete
+    suspend fun removeFamilyMember(familyMember: FamilyMemberEntity): Int
+
     // Query to get family with all its members
     @Transaction
     @Query("SELECT * FROM family WHERE familyId = :familyId")

@@ -18,12 +18,16 @@
 package app.jjerrell.choretender.service.domain.repository
 
 import app.jjerrell.choretender.service.database.ChoreServiceDatabase
+import app.jjerrell.choretender.service.database.entity.FamilyMemberEntity
+import app.jjerrell.choretender.service.database.entity.FamilyWithMembers
 import app.jjerrell.choretender.service.domain.IChoreServiceFamilyRepository
 import app.jjerrell.choretender.service.domain.IChoreServiceUserRepository
 import app.jjerrell.choretender.service.domain.model.family.FamilyDetailCreate
 import app.jjerrell.choretender.service.domain.model.family.FamilyDetailInvite
 import app.jjerrell.choretender.service.domain.model.family.FamilyDetailLeave
 import app.jjerrell.choretender.service.domain.model.family.FamilyDetailRead
+import app.jjerrell.choretender.service.domain.model.user.FamilyMemberDetail
+import app.jjerrell.choretender.service.domain.model.user.UserType
 import io.ktor.util.logging.*
 
 internal class FamilyRepository(
@@ -33,7 +37,9 @@ internal class FamilyRepository(
 ) : IChoreServiceFamilyRepository {
     override suspend fun getFamilyDetail(id: Long): FamilyDetailRead? {
         return try {
-            throw NotImplementedError("Not yet implemented")
+            db.familyDao()
+                .getFamilyWithMembers(familyId = id)
+                .toFamilyDetail()
         } catch (e: Throwable) {
             throw e
         }
@@ -63,3 +69,28 @@ internal class FamilyRepository(
         }
     }
 }
+
+private fun FamilyWithMembers.toFamilyDetail(): FamilyDetailRead {
+    val membersInviteesPair = members.partition { it.isConfirmed }
+    return FamilyDetailRead(
+        id = family.familyId,
+        name = family.familyName,
+        invitees = membersInviteesPair.second.map { it.toMemberDetail() },
+        members = membersInviteesPair.first.map { it.toMemberDetail() },
+        createdBy = family.createdBy,
+        createdDate = family.createdDate,
+        updatedBy = family.updatedBy,
+        updatedDate = family.updatedDate
+    )
+}
+
+private fun FamilyMemberEntity.toMemberDetail() = FamilyMemberDetail(
+    id = user.userId,
+    memberId = memberId,
+    name = user.name,
+    type = UserType.valueOf(user.userType),
+    contactInfo = user.contact?.toContactDetail(),
+    invitedBy = invitedBy,
+    invitedDate = invitedDate,
+    isConfirmed = isConfirmed
+)
