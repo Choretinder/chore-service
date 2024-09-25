@@ -22,7 +22,6 @@ import app.jjerrell.choretender.service.database.entity.FamilyEntity
 import app.jjerrell.choretender.service.database.entity.FamilyMemberEntity
 import app.jjerrell.choretender.service.database.entity.FamilyWithMembers
 import app.jjerrell.choretender.service.domain.IChoreServiceFamilyRepository
-import app.jjerrell.choretender.service.domain.IChoreServiceUserRepository
 import app.jjerrell.choretender.service.domain.model.family.FamilyDetailCreate
 import app.jjerrell.choretender.service.domain.model.family.FamilyDetailInvite
 import app.jjerrell.choretender.service.domain.model.family.FamilyDetailLeave
@@ -33,10 +32,8 @@ import io.ktor.server.plugins.*
 import io.ktor.util.logging.*
 import kotlinx.datetime.Clock
 
-internal class FamilyRepository(
-    private val db: ChoreServiceDatabase,
-    private val logger: Logger
-) : IChoreServiceFamilyRepository {
+internal class FamilyRepository(private val db: ChoreServiceDatabase, private val logger: Logger) :
+    IChoreServiceFamilyRepository {
     override suspend fun getFamilyDetail(id: Long): FamilyDetailRead? {
         return try {
             db.familyDao().getFamilyWithMembers(familyId = id).toFamilyDetail()
