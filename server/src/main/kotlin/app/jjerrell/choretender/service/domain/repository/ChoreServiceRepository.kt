@@ -26,17 +26,17 @@ import app.jjerrell.choretender.service.domain.model.user.UserDetailRead
 import app.jjerrell.choretender.service.domain.model.user.UserDetailUpdate
 
 interface IChoreServiceFamilyRepository {
-    suspend fun getFamilyDetail(id: Long): FamilyDetailRead?
+    suspend fun getFamilyDetail(id: Long): FamilyDetailRead
 
-    suspend fun createFamily(detail: FamilyDetailCreate): FamilyDetailRead?
+    suspend fun createFamily(detail: FamilyDetailCreate): FamilyDetailRead
 
-    suspend fun inviteFamilyMember(detail: FamilyDetailInvite): FamilyDetailRead?
+    suspend fun inviteFamilyMember(familyId: Long, detail: FamilyDetailInvite): FamilyDetailRead
 
-    suspend fun verifyFamilyMember(detail: FamilyMemberVerify): FamilyDetailRead?
+    suspend fun verifyFamilyMember(familyId: Long, detail: FamilyMemberVerify): FamilyDetailRead
 
-    suspend fun changeMemberRole(detail: FamilyMemberChangeRole): FamilyDetailRead?
+    suspend fun changeMemberRole(familyId: Long, detail: FamilyMemberChangeRole): FamilyDetailRead
 
-    suspend fun leaveFamilyGroup(detail: FamilyDetailLeave): FamilyDetailRead
+    suspend fun leaveFamilyGroup(familyId: Long, detail: FamilyDetailLeave): FamilyDetailRead
 }
 
 interface IChoreServiceUserRepository {

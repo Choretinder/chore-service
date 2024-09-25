@@ -31,29 +31,6 @@ internal fun Routing.familyRoutes() {
     val familyRepository by inject<IChoreServiceFamilyRepository>()
 
     route("family") {
-        get("{id?}") {
-            try {
-                call.parameters["id"]?.toLongOrNull()?.let {
-                    val familyLookup = familyRepository.getFamilyDetail(it)
-                    if (familyLookup == null) {
-                        call.respond(
-                            HttpStatusCode.NotFound,
-                            "Could not locate a family with the ID: $it"
-                        )
-                    } else {
-                        call.respond(familyLookup)
-                    }
-                }
-                    ?: run {
-                        call.respond(HttpStatusCode.BadRequest, "Missing or invalid family ID.")
-                    }
-            } catch (e: Throwable) {
-                call.respond(
-                    HttpStatusCode.InternalServerError,
-                    "Unexpected Failure.\n${e.message}"
-                )
-            }
-        }
         post {
             try {
                 val familyCreateBody = call.receive<FamilyDetailCreate>()
@@ -73,72 +50,108 @@ internal fun Routing.familyRoutes() {
                 )
             }
         }
-        post("invite") {
-            try {
-                val familyInviteBody = call.receive<FamilyDetailInvite>()
-                val updatedFamily = familyRepository.inviteFamilyMember(familyInviteBody)
-                if (updatedFamily == null) {
-                    call.respond(HttpStatusCode.NotFound)
-                } else {
-                    call.respond(updatedFamily)
+        route("{id}") {
+            get {
+                try {
+                    call.parameters["id"]?.toLongOrNull()?.let {
+                        val familyLookup = familyRepository.getFamilyDetail(it)
+                        if (familyLookup == null) {
+                            call.respond(
+                                HttpStatusCode.NotFound,
+                                "Could not locate a family with the ID: $it"
+                            )
+                        } else {
+                            call.respond(familyLookup)
+                        }
+                    }
+                        ?: run {
+                            call.respond(HttpStatusCode.BadRequest, "Missing or invalid family ID.")
+                        }
+                } catch (e: Throwable) {
+                    call.respond(
+                        HttpStatusCode.InternalServerError,
+                        "Unexpected Failure.\n${e.message}"
+                    )
                 }
-            } catch (e: ContentTransformationException) {
-                call.respond(HttpStatusCode.BadRequest)
-            } catch (e: Throwable) {
-                call.respond(
-                    HttpStatusCode.InternalServerError,
-                    "Unexpected Failure.\n${e.message}"
-                )
             }
-        }
-        post("leave") {
-            try {
-                val familyLeaveBody = call.receive<FamilyDetailLeave>()
-                val updatedFamily = familyRepository.leaveFamilyGroup(familyLeaveBody)
-                call.respond(updatedFamily)
-            } catch (e: ContentTransformationException) {
-                call.respond(HttpStatusCode.BadRequest)
-            } catch (e: Throwable) {
-                call.respond(
-                    HttpStatusCode.InternalServerError,
-                    "Unexpected Failure.\n${e.message}"
-                )
-            }
-        }
-        post("verify") {
-            try {
-                val familyVerifyBody = call.receive<FamilyMemberVerify>()
-                val updatedFamily = familyRepository.verifyFamilyMember(familyVerifyBody)
-                if (updatedFamily == null) {
-                    call.respond(HttpStatusCode.NotFound)
-                } else {
-                    call.respond(updatedFamily)
+            post("invite") {
+                try {
+                    call.parameters["id"]?.toLongOrNull()?.let {
+                        val familyInviteBody = call.receive<FamilyDetailInvite>()
+                        val updatedFamily =
+                            familyRepository.inviteFamilyMember(it, familyInviteBody)
+                        call.respond(updatedFamily)
+                    }
+                        ?: run {
+                            call.respond(HttpStatusCode.BadRequest, "Missing or invalid family ID.")
+                        }
+                } catch (e: ContentTransformationException) {
+                    call.respond(HttpStatusCode.BadRequest)
+                } catch (e: Throwable) {
+                    call.respond(
+                        HttpStatusCode.InternalServerError,
+                        "Unexpected Failure.\n${e.message}"
+                    )
                 }
-            } catch (e: ContentTransformationException) {
-                call.respond(HttpStatusCode.BadRequest)
-            } catch (e: Throwable) {
-                call.respond(
-                    HttpStatusCode.InternalServerError,
-                    "Unexpected Failure.\n${e.message}"
-                )
             }
-        }
-        post("role") {
-            try {
-                val familyMemberRoleBody = call.receive<FamilyMemberChangeRole>()
-                val updatedFamily = familyRepository.changeMemberRole(familyMemberRoleBody)
-                if (updatedFamily == null) {
-                    call.respond(HttpStatusCode.NotFound)
-                } else {
-                    call.respond(updatedFamily)
+            post("leave") {
+                try {
+                    call.parameters["id"]?.toLongOrNull()?.let {
+                        val familyLeaveBody = call.receive<FamilyDetailLeave>()
+                        val updatedFamily = familyRepository.leaveFamilyGroup(it, familyLeaveBody)
+                        call.respond(updatedFamily)
+                    }
+                        ?: run {
+                            call.respond(HttpStatusCode.BadRequest, "Missing or invalid family ID.")
+                        }
+                } catch (e: ContentTransformationException) {
+                    call.respond(HttpStatusCode.BadRequest)
+                } catch (e: Throwable) {
+                    call.respond(
+                        HttpStatusCode.InternalServerError,
+                        "Unexpected Failure.\n${e.message}"
+                    )
                 }
-            } catch (e: ContentTransformationException) {
-                call.respond(HttpStatusCode.BadRequest)
-            } catch (e: Throwable) {
-                call.respond(
-                    HttpStatusCode.InternalServerError,
-                    "Unexpected Failure.\n${e.message}"
-                )
+            }
+            post("verify") {
+                try {
+                    call.parameters["id"]?.toLongOrNull()?.let {
+                        val familyVerifyBody = call.receive<FamilyMemberVerify>()
+                        val updatedFamily =
+                            familyRepository.verifyFamilyMember(it, familyVerifyBody)
+                        call.respond(updatedFamily)
+                    }
+                        ?: run {
+                            call.respond(HttpStatusCode.BadRequest, "Missing or invalid family ID.")
+                        }
+                } catch (e: ContentTransformationException) {
+                    call.respond(HttpStatusCode.BadRequest)
+                } catch (e: Throwable) {
+                    call.respond(
+                        HttpStatusCode.InternalServerError,
+                        "Unexpected Failure.\n${e.message}"
+                    )
+                }
+            }
+            post("role") {
+                try {
+                    call.parameters["id"]?.toLongOrNull()?.let {
+                        val familyMemberRoleBody = call.receive<FamilyMemberChangeRole>()
+                        val updatedFamily =
+                            familyRepository.changeMemberRole(it, familyMemberRoleBody)
+                        call.respond(updatedFamily)
+                    }
+                        ?: run {
+                            call.respond(HttpStatusCode.BadRequest, "Missing or invalid family ID.")
+                        }
+                } catch (e: ContentTransformationException) {
+                    call.respond(HttpStatusCode.BadRequest)
+                } catch (e: Throwable) {
+                    call.respond(
+                        HttpStatusCode.InternalServerError,
+                        "Unexpected Failure.\n${e.message}"
+                    )
+                }
             }
         }
     }

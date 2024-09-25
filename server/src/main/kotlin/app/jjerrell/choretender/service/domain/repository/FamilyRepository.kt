@@ -66,44 +66,48 @@ internal class FamilyRepository(private val db: ChoreServiceDatabase, private va
         detail.invitees
             ?.takeUnless { it.isEmpty() }
             ?.forEach {
-                val inviteeEntity = db.userDao().getUserById(it)
-                db.familyDao()
-                    .insertFamilyMember(
-                        FamilyMemberEntity(
-                            familyId = familyId,
-                            user = inviteeEntity,
-                            role = UserType.STANDARD.name,
-                            isConfirmed = false,
-                            invitedBy = user.userId,
-                            invitedDate = Clock.System.now().epochSeconds
-                        )
-                    )
+                inviteFamilyMember(
+                    familyId,
+                    FamilyDetailInvite(inviteeId = it, invitedBy = user.userId)
+                )
             }
 
         // Get the family detail
         return db.familyDao().getFamilyWithMembers(familyId).toFamilyDetail()
     }
 
-    override suspend fun inviteFamilyMember(detail: FamilyDetailInvite): FamilyDetailRead {
+    override suspend fun inviteFamilyMember(
+        familyId: Long,
+        detail: FamilyDetailInvite
+    ): FamilyDetailRead {
         val foundInvitee = db.userDao().getUserById(detail.inviteeId)
-        // Insert the invitee if located
-        db.familyDao()
-            .insertFamilyMember(
-                FamilyMemberEntity(
-                    familyId = detail.familyId,
-                    user = foundInvitee,
-                    role = UserType.STANDARD.name,
-                    isConfirmed = false,
-                    invitedBy = detail.invitedBy,
-                    invitedDate = Clock.System.now().epochSeconds
+        val isNewMember =
+            db.familyDao().getFamilyWithMembers(familyId).members.none {
+                it.user.userId == detail.inviteeId
+            }
+        // Insert the invitee if located and new
+        if (isNewMember) {
+            db.familyDao()
+                .insertFamilyMember(
+                    FamilyMemberEntity(
+                        familyId = familyId,
+                        user = foundInvitee,
+                        role = UserType.STANDARD.name,
+                        isConfirmed = false,
+                        invitedBy = detail.invitedBy,
+                        invitedDate = Clock.System.now().epochSeconds
+                    )
                 )
-            )
+        }
         // Get the family detail
-        return db.familyDao().getFamilyWithMembers(detail.familyId).toFamilyDetail()
+        return db.familyDao().getFamilyWithMembers(familyId).toFamilyDetail()
     }
 
-    override suspend fun verifyFamilyMember(detail: FamilyMemberVerify): FamilyDetailRead {
-        val members = db.familyDao().getFamilyWithMembers(detail.familyId).members
+    override suspend fun verifyFamilyMember(
+        familyId: Long,
+        detail: FamilyMemberVerify
+    ): FamilyDetailRead {
+        val members = db.familyDao().getFamilyWithMembers(familyId).members
         val invitee =
             members
                 .filterNot { it.isConfirmed }
@@ -113,12 +117,15 @@ internal class FamilyRepository(private val db: ChoreServiceDatabase, private va
             throw NotFoundException("Member not found")
         } else {
             db.familyDao().updateFamilyMember(invitee)
-            db.familyDao().getFamilyWithMembers(detail.familyId).toFamilyDetail()
+            db.familyDao().getFamilyWithMembers(familyId).toFamilyDetail()
         }
     }
 
-    override suspend fun changeMemberRole(detail: FamilyMemberChangeRole): FamilyDetailRead {
-        val members = db.familyDao().getFamilyWithMembers(detail.familyId).members
+    override suspend fun changeMemberRole(
+        familyId: Long,
+        detail: FamilyMemberChangeRole
+    ): FamilyDetailRead {
+        val members = db.familyDao().getFamilyWithMembers(familyId).members
         val targetMember =
             members
                 .filter { it.isConfirmed }
@@ -128,7 +135,7 @@ internal class FamilyRepository(private val db: ChoreServiceDatabase, private va
             throw NotFoundException("Verified member not found")
         } else {
             if (db.familyDao().updateFamilyMember(targetMember) > 0) {
-                db.familyDao().getFamilyWithMembers(detail.familyId).toFamilyDetail()
+                db.familyDao().getFamilyWithMembers(familyId).toFamilyDetail()
             } else {
                 throw UnsupportedOperationException(
                     "Failed to update the role for ${targetMember.memberId}"
@@ -137,8 +144,11 @@ internal class FamilyRepository(private val db: ChoreServiceDatabase, private va
         }
     }
 
-    override suspend fun leaveFamilyGroup(detail: FamilyDetailLeave): FamilyDetailRead {
-        val members = db.familyDao().getFamilyWithMembers(detail.familyId).members
+    override suspend fun leaveFamilyGroup(
+        familyId: Long,
+        detail: FamilyDetailLeave
+    ): FamilyDetailRead {
+        val members = db.familyDao().getFamilyWithMembers(familyId).members
         val foundMember = members.firstOrNull { it.memberId == detail.memberId }
         return when (foundMember?.let { UserType.valueOf(it.role) }) {
             UserType.STANDARD -> removeMember(foundMember)

@@ -51,14 +51,12 @@ data class FamilyDetailRead(
 
 @Serializable
 data class FamilyDetailInvite(
-    val familyId: Long,
     val inviteeId: Long,
     val invitedBy: Long,
 )
 
-@Serializable data class FamilyDetailLeave(val familyId: Long, val memberId: Long)
+@Serializable data class FamilyDetailLeave(val memberId: Long)
 
-@Serializable data class FamilyMemberVerify(val familyId: Long, val memberId: Long)
+@Serializable data class FamilyMemberVerify(val memberId: Long)
 
-@Serializable
-data class FamilyMemberChangeRole(val familyId: Long, val memberId: Long, val role: UserType)
+@Serializable data class FamilyMemberChangeRole(val memberId: Long, val role: UserType)
