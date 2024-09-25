@@ -52,7 +52,7 @@ internal fun Routing.familyRoutes() {
             } catch (e: Throwable) {
                 call.respond(
                     HttpStatusCode.InternalServerError,
-                    "Unexpected Failure.\n${e.stackTraceToString()}"
+                    "Unexpected Failure.\n${e.message}"
                 )
             }
         }
@@ -71,7 +71,7 @@ internal fun Routing.familyRoutes() {
             } catch (e: Throwable) {
                 call.respond(
                     HttpStatusCode.InternalServerError,
-                    "Unexpected Failure.\n${e.stackTraceToString()}"
+                    "Unexpected Failure.\n${e.message}"
                 )
             }
         }
@@ -89,7 +89,7 @@ internal fun Routing.familyRoutes() {
             } catch (e: Throwable) {
                 call.respond(
                     HttpStatusCode.InternalServerError,
-                    "Unexpected Failure.\n${e.stackTraceToString()}"
+                    "Unexpected Failure.\n${e.message}"
                 )
             }
         }
@@ -107,7 +107,7 @@ internal fun Routing.familyRoutes() {
             } catch (e: Throwable) {
                 call.respond(
                     HttpStatusCode.InternalServerError,
-                    "Unexpected Failure.\n${e.stackTraceToString()}"
+                    "Unexpected Failure.\n${e.message}"
                 )
             }
         }

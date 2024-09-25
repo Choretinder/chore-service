@@ -115,21 +115,28 @@ internal class FamilyRepository(private val db: ChoreServiceDatabase, private va
     }
 
     override suspend fun leaveFamilyGroup(detail: FamilyDetailLeave): FamilyDetailRead? {
-        return try {
-            val foundMember =
-                db.familyDao().getFamilyWithMembers(detail.familyId).members.firstOrNull {
-                    it.memberId == detail.memberId
+        try {
+            val members = db.familyDao().getFamilyWithMembers(detail.familyId).members
+            val foundMember = members
+                    .firstOrNull { it.memberId == detail.memberId }
+            return when (foundMember?.let { UserType.valueOf(it.role) }) {
+                UserType.STANDARD -> removeMember(foundMember)
+                UserType.MANAGER -> if (members.count { it.role == UserType.MANAGER.name } > 1) {
+                    removeMember(foundMember)
+                } else {
+                    throw UnsupportedOperationException("Unable to remove the only manager from a family")
                 }
-            foundMember?.let {
-                // Remove the family member
-                db.familyDao().removeFamilyMember(it)
-                // Return the updated family
-                db.familyDao().getFamilyWithMembers(detail.familyId).toFamilyDetail()
+
+                null -> throw NotFoundException("Member not found")
             }
-                ?: run { throw NotFoundException("Member not found") }
         } catch (e: Throwable) {
             throw e
         }
+    }
+
+    private suspend fun removeMember(entity: FamilyMemberEntity): FamilyDetailRead {
+        db.familyDao().removeFamilyMember(entity)
+        return db.familyDao().getFamilyWithMembers(entity.familyId).toFamilyDetail()
     }
 }
 
