@@ -20,10 +20,7 @@ package app.jjerrell.choretender.service.domain
 import app.jjerrell.choretender.service.domain.model.chore.ChoreDetailCreate
 import app.jjerrell.choretender.service.domain.model.chore.ChoreDetailRead
 import app.jjerrell.choretender.service.domain.model.chore.ChoreDetailUpdate
-import app.jjerrell.choretender.service.domain.model.family.FamilyDetailCreate
-import app.jjerrell.choretender.service.domain.model.family.FamilyDetailInvite
-import app.jjerrell.choretender.service.domain.model.family.FamilyDetailLeave
-import app.jjerrell.choretender.service.domain.model.family.FamilyDetailRead
+import app.jjerrell.choretender.service.domain.model.family.*
 import app.jjerrell.choretender.service.domain.model.user.UserDetailCreate
 import app.jjerrell.choretender.service.domain.model.user.UserDetailRead
 import app.jjerrell.choretender.service.domain.model.user.UserDetailUpdate
@@ -35,7 +32,11 @@ interface IChoreServiceFamilyRepository {
 
     suspend fun inviteFamilyMember(detail: FamilyDetailInvite): FamilyDetailRead?
 
-    suspend fun leaveFamilyGroup(detail: FamilyDetailLeave): FamilyDetailRead?
+    suspend fun verifyFamilyMember(detail: FamilyMemberVerify): FamilyDetailRead?
+
+    suspend fun changeMemberRole(detail: FamilyMemberChangeRole): FamilyDetailRead?
+
+    suspend fun leaveFamilyGroup(detail: FamilyDetailLeave): FamilyDetailRead
 }
 
 interface IChoreServiceUserRepository {

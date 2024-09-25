@@ -18,9 +18,7 @@
 package app.jjerrell.choretender.service.route
 
 import app.jjerrell.choretender.service.domain.IChoreServiceFamilyRepository
-import app.jjerrell.choretender.service.domain.model.family.FamilyDetailCreate
-import app.jjerrell.choretender.service.domain.model.family.FamilyDetailInvite
-import app.jjerrell.choretender.service.domain.model.family.FamilyDetailLeave
+import app.jjerrell.choretender.service.domain.model.family.*
 import io.ktor.http.*
 import io.ktor.server.application.*
 import io.ktor.server.request.*
@@ -97,6 +95,38 @@ internal fun Routing.familyRoutes() {
             try {
                 val familyLeaveBody = call.receive<FamilyDetailLeave>()
                 val updatedFamily = familyRepository.leaveFamilyGroup(familyLeaveBody)
+                call.respond(updatedFamily)
+            } catch (e: ContentTransformationException) {
+                call.respond(HttpStatusCode.BadRequest)
+            } catch (e: Throwable) {
+                call.respond(
+                    HttpStatusCode.InternalServerError,
+                    "Unexpected Failure.\n${e.message}"
+                )
+            }
+        }
+        post("verify") {
+            try {
+                val familyVerifyBody = call.receive<FamilyMemberVerify>()
+                val updatedFamily = familyRepository.verifyFamilyMember(familyVerifyBody)
+                if (updatedFamily == null) {
+                    call.respond(HttpStatusCode.NotFound)
+                } else {
+                    call.respond(updatedFamily)
+                }
+            } catch (e: ContentTransformationException) {
+                call.respond(HttpStatusCode.BadRequest)
+            } catch (e: Throwable) {
+                call.respond(
+                    HttpStatusCode.InternalServerError,
+                    "Unexpected Failure.\n${e.message}"
+                )
+            }
+        }
+        post("role") {
+            try {
+                val familyMemberRoleBody = call.receive<FamilyMemberChangeRole>()
+                val updatedFamily = familyRepository.changeMemberRole(familyMemberRoleBody)
                 if (updatedFamily == null) {
                     call.respond(HttpStatusCode.NotFound)
                 } else {

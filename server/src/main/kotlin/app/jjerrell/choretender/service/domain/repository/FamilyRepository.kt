@@ -22,10 +22,7 @@ import app.jjerrell.choretender.service.database.entity.FamilyEntity
 import app.jjerrell.choretender.service.database.entity.FamilyMemberEntity
 import app.jjerrell.choretender.service.database.entity.FamilyWithMembers
 import app.jjerrell.choretender.service.domain.IChoreServiceFamilyRepository
-import app.jjerrell.choretender.service.domain.model.family.FamilyDetailCreate
-import app.jjerrell.choretender.service.domain.model.family.FamilyDetailInvite
-import app.jjerrell.choretender.service.domain.model.family.FamilyDetailLeave
-import app.jjerrell.choretender.service.domain.model.family.FamilyDetailRead
+import app.jjerrell.choretender.service.domain.model.family.*
 import app.jjerrell.choretender.service.domain.model.user.FamilyMemberDetail
 import app.jjerrell.choretender.service.domain.model.user.UserType
 import io.ktor.server.plugins.*
@@ -34,103 +31,126 @@ import kotlinx.datetime.Clock
 
 internal class FamilyRepository(private val db: ChoreServiceDatabase, private val logger: Logger) :
     IChoreServiceFamilyRepository {
-    override suspend fun getFamilyDetail(id: Long): FamilyDetailRead? {
-        return try {
-            db.familyDao().getFamilyWithMembers(familyId = id).toFamilyDetail()
-        } catch (e: Throwable) {
-            throw e
-        }
+    override suspend fun getFamilyDetail(id: Long): FamilyDetailRead {
+        return db.familyDao().getFamilyWithMembers(familyId = id).toFamilyDetail()
     }
 
-    override suspend fun createFamily(detail: FamilyDetailCreate): FamilyDetailRead? {
-        return try {
-            val user = db.userDao().getUserById(detail.createdBy)
-            // Create the family
-            val familyEntity =
-                FamilyEntity(
-                    familyName = detail.name,
-                    createdBy = detail.createdBy,
-                    createdDate = detail.createdDate,
-                    updatedBy = null,
-                    updatedDate = null
+    override suspend fun createFamily(detail: FamilyDetailCreate): FamilyDetailRead {
+        val user = db.userDao().getUserById(detail.createdBy)
+
+        // Create the family
+        val familyEntity =
+            FamilyEntity(
+                familyName = detail.name,
+                createdBy = detail.createdBy,
+                createdDate = detail.createdDate,
+                updatedBy = null,
+                updatedDate = null
+            )
+        val familyId = db.familyDao().insertFamily(familyEntity)
+
+        // Insert creator as the original member
+        db.familyDao()
+            .insertFamilyMember(
+                FamilyMemberEntity(
+                    familyId = familyId,
+                    user = user,
+                    role = UserType.MANAGER.name,
+                    isConfirmed = true,
+                    invitedBy = 0,
+                    invitedDate = Clock.System.now().epochSeconds
                 )
-            val familyId = db.familyDao().insertFamily(familyEntity)
-            // Insert creator as the original member
-            db.familyDao()
-                .insertFamilyMember(
-                    FamilyMemberEntity(
-                        familyId = familyId,
-                        user = user,
-                        role = UserType.MANAGER.name,
-                        isConfirmed = true,
-                        invitedBy = 0,
-                        invitedDate = Clock.System.now().epochSeconds
-                    )
-                )
-            // Insert any invitees
-            detail.invitees
-                ?.takeUnless { it.isEmpty() }
-                ?.forEach {
-                    val inviteeEntity = db.userDao().getUserById(it)
-                    db.familyDao()
-                        .insertFamilyMember(
-                            FamilyMemberEntity(
-                                familyId = familyId,
-                                user = inviteeEntity,
-                                role = UserType.STANDARD.name,
-                                isConfirmed = false,
-                                invitedBy = user.userId,
-                                invitedDate = Clock.System.now().epochSeconds
-                            )
+            )
+
+        // Insert any invitees
+        detail.invitees
+            ?.takeUnless { it.isEmpty() }
+            ?.forEach {
+                val inviteeEntity = db.userDao().getUserById(it)
+                db.familyDao()
+                    .insertFamilyMember(
+                        FamilyMemberEntity(
+                            familyId = familyId,
+                            user = inviteeEntity,
+                            role = UserType.STANDARD.name,
+                            isConfirmed = false,
+                            invitedBy = user.userId,
+                            invitedDate = Clock.System.now().epochSeconds
                         )
-                }
-
-            // Get the family detail
-            db.familyDao().getFamilyWithMembers(familyId).toFamilyDetail()
-        } catch (e: Throwable) {
-            throw e
-        }
-    }
-
-    override suspend fun inviteFamilyMember(detail: FamilyDetailInvite): FamilyDetailRead? {
-        return try {
-            val foundInvitee = db.userDao().getUserById(detail.inviteeId)
-            // Insert the invitee if located
-            db.familyDao()
-                .insertFamilyMember(
-                    FamilyMemberEntity(
-                        familyId = detail.familyId,
-                        user = foundInvitee,
-                        role = UserType.STANDARD.name,
-                        isConfirmed = false,
-                        invitedBy = detail.invitedBy,
-                        invitedDate = Clock.System.now().epochSeconds
                     )
+            }
+
+        // Get the family detail
+        return db.familyDao().getFamilyWithMembers(familyId).toFamilyDetail()
+    }
+
+    override suspend fun inviteFamilyMember(detail: FamilyDetailInvite): FamilyDetailRead {
+        val foundInvitee = db.userDao().getUserById(detail.inviteeId)
+        // Insert the invitee if located
+        db.familyDao()
+            .insertFamilyMember(
+                FamilyMemberEntity(
+                    familyId = detail.familyId,
+                    user = foundInvitee,
+                    role = UserType.STANDARD.name,
+                    isConfirmed = false,
+                    invitedBy = detail.invitedBy,
+                    invitedDate = Clock.System.now().epochSeconds
                 )
-            // Get the family detail
+            )
+        // Get the family detail
+        return db.familyDao().getFamilyWithMembers(detail.familyId).toFamilyDetail()
+    }
+
+    override suspend fun verifyFamilyMember(detail: FamilyMemberVerify): FamilyDetailRead {
+        val members = db.familyDao().getFamilyWithMembers(detail.familyId).members
+        val invitee =
+            members
+                .filterNot { it.isConfirmed }
+                .firstOrNull { it.memberId == detail.memberId }
+                ?.copy(isConfirmed = true)
+        return if (invitee == null) {
+            throw NotFoundException("Member not found")
+        } else {
+            db.familyDao().updateFamilyMember(invitee)
             db.familyDao().getFamilyWithMembers(detail.familyId).toFamilyDetail()
-        } catch (e: Throwable) {
-            throw e
         }
     }
 
-    override suspend fun leaveFamilyGroup(detail: FamilyDetailLeave): FamilyDetailRead? {
-        try {
-            val members = db.familyDao().getFamilyWithMembers(detail.familyId).members
-            val foundMember = members
-                    .firstOrNull { it.memberId == detail.memberId }
-            return when (foundMember?.let { UserType.valueOf(it.role) }) {
-                UserType.STANDARD -> removeMember(foundMember)
-                UserType.MANAGER -> if (members.count { it.role == UserType.MANAGER.name } > 1) {
+    override suspend fun changeMemberRole(detail: FamilyMemberChangeRole): FamilyDetailRead {
+        val members = db.familyDao().getFamilyWithMembers(detail.familyId).members
+        val targetMember =
+            members
+                .filter { it.isConfirmed }
+                .firstOrNull { it.memberId == detail.memberId }
+                ?.copy(role = detail.role.name)
+        return if (targetMember == null) {
+            throw NotFoundException("Verified member not found")
+        } else {
+            if (db.familyDao().updateFamilyMember(targetMember) > 0) {
+                db.familyDao().getFamilyWithMembers(detail.familyId).toFamilyDetail()
+            } else {
+                throw UnsupportedOperationException(
+                    "Failed to update the role for ${targetMember.memberId}"
+                )
+            }
+        }
+    }
+
+    override suspend fun leaveFamilyGroup(detail: FamilyDetailLeave): FamilyDetailRead {
+        val members = db.familyDao().getFamilyWithMembers(detail.familyId).members
+        val foundMember = members.firstOrNull { it.memberId == detail.memberId }
+        return when (foundMember?.let { UserType.valueOf(it.role) }) {
+            UserType.STANDARD -> removeMember(foundMember)
+            UserType.MANAGER ->
+                if (members.count { it.role == UserType.MANAGER.name } > 1) {
                     removeMember(foundMember)
                 } else {
-                    throw UnsupportedOperationException("Unable to remove the only manager from a family")
+                    throw UnsupportedOperationException(
+                        "Unable to remove the only manager from a family"
+                    )
                 }
-
-                null -> throw NotFoundException("Member not found")
-            }
-        } catch (e: Throwable) {
-            throw e
+            null -> throw NotFoundException("Member not found")
         }
     }
 
@@ -160,7 +180,7 @@ private fun FamilyMemberEntity.toMemberDetail() =
         id = user.userId,
         memberId = memberId,
         name = user.name,
-        type = UserType.valueOf(user.userType),
+        type = UserType.valueOf(role),
         contactInfo = user.contact?.toContactDetail(),
         invitedBy = invitedBy,
         invitedDate = invitedDate,

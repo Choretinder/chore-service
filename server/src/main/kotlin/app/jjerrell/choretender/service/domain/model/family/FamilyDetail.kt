@@ -21,6 +21,7 @@ import app.jjerrell.choretender.service.domain.model.common.ICreatable
 import app.jjerrell.choretender.service.domain.model.common.IIdentifiable
 import app.jjerrell.choretender.service.domain.model.common.IUpdateable
 import app.jjerrell.choretender.service.domain.model.user.FamilyMemberDetail
+import app.jjerrell.choretender.service.domain.model.user.UserType
 import kotlinx.datetime.Clock
 import kotlinx.serialization.Serializable
 
@@ -56,3 +57,8 @@ data class FamilyDetailInvite(
 )
 
 @Serializable data class FamilyDetailLeave(val familyId: Long, val memberId: Long)
+
+@Serializable data class FamilyMemberVerify(val familyId: Long, val memberId: Long)
+
+@Serializable
+data class FamilyMemberChangeRole(val familyId: Long, val memberId: Long, val role: UserType)
