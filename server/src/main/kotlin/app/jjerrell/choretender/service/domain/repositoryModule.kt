@@ -27,8 +27,6 @@ private class RepositoryLogger : Logger by KtorSimpleLogger("RepositoryLogger")
 val repositoryModule = module {
     single<Logger> { RepositoryLogger() }
     factory<IChoreServiceUserRepository> { UserRepository(db = get(), logger = get()) }
-    factory<IChoreServiceFamilyRepository> {
-        FamilyRepository(db = get(), userRepository = get(), logger = get())
-    }
+    factory<IChoreServiceFamilyRepository> { FamilyRepository(db = get(), logger = get()) }
     factory<IChoreServiceChoreRepository> { TODO("Create Chore Repository") }
 }

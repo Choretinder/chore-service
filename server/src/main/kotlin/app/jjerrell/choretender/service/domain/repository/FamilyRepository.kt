@@ -35,7 +35,6 @@ import kotlinx.datetime.Clock
 
 internal class FamilyRepository(
     private val db: ChoreServiceDatabase,
-    private val userRepository: IChoreServiceUserRepository,
     private val logger: Logger
 ) : IChoreServiceFamilyRepository {
     override suspend fun getFamilyDetail(id: Long): FamilyDetailRead? {
