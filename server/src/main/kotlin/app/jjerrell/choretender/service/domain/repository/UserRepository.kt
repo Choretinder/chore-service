@@ -21,8 +21,8 @@ import app.jjerrell.choretender.service.database.ChoreServiceDatabase
 import app.jjerrell.choretender.service.database.entity.UserEntity
 import app.jjerrell.choretender.service.database.entity.UserEntityContact
 import app.jjerrell.choretender.service.domain.IChoreServiceUserRepository
-import app.jjerrell.choretender.service.domain.model.ContactInfo
-import app.jjerrell.choretender.service.domain.model.ContactType
+import app.jjerrell.choretender.service.domain.model.user.ContactInfo
+import app.jjerrell.choretender.service.domain.model.user.ContactType
 import app.jjerrell.choretender.service.domain.model.user.UserDetailCreate
 import app.jjerrell.choretender.service.domain.model.user.UserDetailRead
 import app.jjerrell.choretender.service.domain.model.user.UserDetailUpdate
@@ -32,48 +32,36 @@ import kotlinx.datetime.Clock
 
 internal class UserRepository(private val db: ChoreServiceDatabase, private val logger: Logger) :
     IChoreServiceUserRepository {
-    override suspend fun getUserDetail(id: Long): UserDetailRead? {
-        return try {
-            db.userDao().getUserById(id).toReadUser()
-        } catch (e: Throwable) {
-            throw e
-        }
+    override suspend fun getUserDetail(id: Long): UserDetailRead {
+        return db.userDao().getUserById(id).toReadUser()
     }
 
-    override suspend fun createUser(detail: UserDetailCreate): UserDetailRead? {
-        return try {
-            val newUserId = db.userDao().insertUser(detail.toEntityUser())
-            getUserDetail(newUserId)
-        } catch (e: Throwable) {
-            throw e
-        }
+    override suspend fun createUser(detail: UserDetailCreate): UserDetailRead {
+        val newUserId = db.userDao().insertUser(detail.toEntityUser())
+        return getUserDetail(newUserId)
     }
 
-    override suspend fun updateUser(detail: UserDetailUpdate): UserDetailRead? {
-        return try {
-            val targetUserUpdate =
-                db.userDao()
-                    .getUserById(detail.id)
-                    .copy(
-                        name = detail.name,
-                        userType = detail.type.name,
-                        updatedDateSeconds = detail.updatedDate ?: Clock.System.now().epochSeconds,
-                        updatedBy = detail.updatedBy
-                    )
-                    .let {
-                        if (detail.contactInfo != null) {
-                            it.copy(contact = detail.contactInfo.toContactEntity())
-                        } else {
-                            it
-                        }
+    override suspend fun updateUser(detail: UserDetailUpdate): UserDetailRead {
+        val targetUserUpdate =
+            db.userDao()
+                .getUserById(detail.id)
+                .copy(
+                    name = detail.name,
+                    userType = detail.type.name,
+                    updatedDateSeconds = detail.updatedDate ?: Clock.System.now().epochSeconds,
+                    updatedBy = detail.updatedBy
+                )
+                .let {
+                    if (detail.contactInfo != null) {
+                        it.copy(contact = detail.contactInfo.toContactEntity())
+                    } else {
+                        it
                     }
-            // operation
-            db.userDao().updateUser(user = targetUserUpdate)
-            // return value
-            db.userDao().getUserById(targetUserUpdate.userId).toReadUser()
-        } catch (e: Throwable) {
-            throw e
-        }
+                }
+        // operation
+        db.userDao().updateUser(user = targetUserUpdate)
+        // return value
+        return db.userDao().getUserById(targetUserUpdate.userId).toReadUser()
     }
 }
 
@@ -112,6 +100,6 @@ internal fun UserEntityContact.toContactDetail() =
         isVerified = isVerified
     )
 
-internal fun ContactInfo.toContactEntity() =
+private fun ContactInfo.toContactEntity() =
     UserEntityContact(resource = resource, contactType = type.name, isVerified = isVerified)
 // endregion

@@ -17,7 +17,6 @@
  */
 package app.jjerrell.choretender.service.domain.model.user
 
-import app.jjerrell.choretender.service.domain.model.ContactInfo
 import kotlinx.serialization.Serializable
 
 enum class UserType {
@@ -54,16 +53,4 @@ data class UserDetailUpdate(
     val contactInfo: ContactInfo?,
     val updatedDate: Long?,
     val updatedBy: Long
-)
-
-@Serializable
-data class FamilyMemberDetail(
-    val id: Long,
-    val memberId: Long,
-    val name: String,
-    val type: UserType,
-    val contactInfo: ContactInfo?,
-    val invitedBy: Long,
-    val invitedDate: Long,
-    val isConfirmed: Boolean
 )

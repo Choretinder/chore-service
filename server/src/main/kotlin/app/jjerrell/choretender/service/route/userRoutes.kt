@@ -28,7 +28,7 @@ import io.ktor.server.routing.*
 import kotlinx.coroutines.async
 import org.koin.ktor.ext.inject
 
-internal fun Routing.userRoutes() {
+internal fun Route.userRoutes() {
     val userRepository by inject<IChoreServiceUserRepository>()
 
     route("user") {
@@ -37,17 +37,12 @@ internal fun Routing.userRoutes() {
                 call.parameters["id"]?.toLongOrNull()?.let {
                     val userLookup = userRepository.getUserDetail(it)
                     if (userLookup == null) {
-                        call.respond(
-                            HttpStatusCode.NotFound,
-                            "Could not locate a user with the ID: $it"
-                        )
+                        call.respond(HttpStatusCode.NotFound)
                     } else {
                         call.respond(userLookup)
                     }
                 }
-                    ?: run {
-                        call.respond(HttpStatusCode.BadRequest, "Missing or invalid User ID.")
-                    }
+                    ?: run { call.respond(HttpStatusCode.BadRequest) }
             } catch (e: Throwable) {
                 call.respond(
                     HttpStatusCode.InternalServerError,
@@ -67,10 +62,7 @@ internal fun Routing.userRoutes() {
             } catch (e: ContentTransformationException) {
                 call.respond(HttpStatusCode.BadRequest)
             } catch (e: Throwable) {
-                call.respond(
-                    HttpStatusCode.InternalServerError,
-                    "Unexpected Failure.\n${e.message}"
-                )
+                call.respond(HttpStatusCode.InternalServerError)
             }
         }
         put {
@@ -85,10 +77,7 @@ internal fun Routing.userRoutes() {
             } catch (e: ContentTransformationException) {
                 call.respond(HttpStatusCode.BadRequest)
             } catch (e: Throwable) {
-                call.respond(
-                    HttpStatusCode.InternalServerError,
-                    "Unexpected Failure.\n${e.message}"
-                )
+                call.respond(HttpStatusCode.InternalServerError)
             }
         }
     }

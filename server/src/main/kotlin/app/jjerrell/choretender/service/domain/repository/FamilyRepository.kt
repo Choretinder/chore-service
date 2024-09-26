@@ -23,7 +23,6 @@ import app.jjerrell.choretender.service.database.entity.FamilyMemberEntity
 import app.jjerrell.choretender.service.database.entity.FamilyWithMembers
 import app.jjerrell.choretender.service.domain.IChoreServiceFamilyRepository
 import app.jjerrell.choretender.service.domain.model.family.*
-import app.jjerrell.choretender.service.domain.model.user.FamilyMemberDetail
 import app.jjerrell.choretender.service.domain.model.user.UserType
 import io.ktor.server.plugins.*
 import io.ktor.util.logging.*
@@ -63,14 +62,12 @@ internal class FamilyRepository(private val db: ChoreServiceDatabase, private va
             )
 
         // Insert any invitees
-        detail.invitees
-            ?.takeUnless { it.isEmpty() }
-            ?.forEach {
-                inviteFamilyMember(
-                    familyId,
-                    FamilyDetailInvite(inviteeId = it, invitedBy = user.userId)
-                )
-            }
+        detail.invitees?.forEach {
+            inviteFamilyMember(
+                familyId,
+                FamilyDetailInvite(inviteeId = it, invitedBy = user.userId)
+            )
+        }
 
         // Get the family detail
         return db.familyDao().getFamilyWithMembers(familyId).toFamilyDetail()

@@ -27,7 +27,7 @@ data class FamilyEntity(
     val createdBy: Long,
     val createdDate: Long,
     val updatedBy: Long?,
-    val updatedDate: Long?,
+    val updatedDate: Long?
 )
 
 @Entity(

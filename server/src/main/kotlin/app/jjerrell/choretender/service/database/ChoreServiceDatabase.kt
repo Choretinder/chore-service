@@ -30,7 +30,7 @@ import kotlinx.coroutines.Dispatchers
 
 @Database(
     entities = [UserEntity::class, FamilyEntity::class, FamilyMemberEntity::class],
-    version = 7
+    version = 8
 )
 abstract class ChoreServiceDatabase : RoomDatabase() {
     abstract fun userDao(): UserDao

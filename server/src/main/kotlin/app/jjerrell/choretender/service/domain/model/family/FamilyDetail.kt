@@ -17,18 +17,9 @@
  */
 package app.jjerrell.choretender.service.domain.model.family
 
-import app.jjerrell.choretender.service.domain.model.user.FamilyMemberDetail
 import app.jjerrell.choretender.service.domain.model.user.UserType
 import kotlinx.datetime.Clock
 import kotlinx.serialization.Serializable
-
-@Serializable
-data class FamilyDetailCreate(
-    val name: String,
-    val invitees: List<Long>? = null,
-    val createdBy: Long,
-    val createdDate: Long = Clock.System.now().epochSeconds
-)
 
 @Serializable
 data class FamilyDetailRead(
@@ -40,6 +31,14 @@ data class FamilyDetailRead(
     val createdDate: Long,
     val updatedDate: Long?,
     val updatedBy: Long?
+)
+
+@Serializable
+data class FamilyDetailCreate(
+    val name: String,
+    val invitees: List<Long>? = null,
+    val createdBy: Long,
+    val createdDate: Long = Clock.System.now().epochSeconds
 )
 
 @Serializable data class FamilyDetailInvite(val inviteeId: Long, val invitedBy: Long)

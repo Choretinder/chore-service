@@ -15,12 +15,20 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-package app.jjerrell.choretender.service
+package app.jjerrell.choretender.service.domain.model.family
 
-class Greeting {
-    private val platform = getPlatform()
+import app.jjerrell.choretender.service.domain.model.user.ContactInfo
+import app.jjerrell.choretender.service.domain.model.user.UserType
+import kotlinx.serialization.Serializable
 
-    fun greet(): String {
-        return "Hello, ${platform.name}!"
-    }
-}
+@Serializable
+data class FamilyMemberDetail(
+    val id: Long,
+    val memberId: Long,
+    val name: String,
+    val type: UserType,
+    val contactInfo: ContactInfo?,
+    val invitedBy: Long,
+    val invitedDate: Long,
+    val isConfirmed: Boolean
+)

@@ -41,8 +41,10 @@ fun Application.module() {
     setupPlugins()
 
     routing {
-        userRoutes()
-        familyRoutes()
+        route("v1") {
+            userRoutes()
+            familyRoutes()
+        }
     }
 }
 
