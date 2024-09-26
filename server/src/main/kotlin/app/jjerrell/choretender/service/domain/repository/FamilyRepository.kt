@@ -143,7 +143,7 @@ internal class FamilyRepository(private val db: ChoreServiceDatabase, private va
 
     override suspend fun leaveFamilyGroup(
         familyId: Long,
-        detail: FamilyDetailLeave
+        detail: FamilyMemberLeave
     ): FamilyDetailRead {
         val members = db.familyDao().getFamilyWithMembers(familyId).members
         val foundMember = members.firstOrNull { it.memberId == detail.memberId }

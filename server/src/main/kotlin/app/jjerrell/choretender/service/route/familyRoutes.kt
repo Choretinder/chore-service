@@ -73,7 +73,7 @@ internal fun Route.familyRoutes() {
             post("leave") {
                 try {
                     call.parameters[PARAM_FAMILY_ID]?.toLongOrNull()?.let {
-                        val familyLeaveBody = call.receive<FamilyDetailLeave>()
+                        val familyLeaveBody = call.receive<FamilyMemberLeave>()
                         val updatedFamily = familyRepository.leaveFamilyGroup(it, familyLeaveBody)
                         call.respond(updatedFamily)
                     }

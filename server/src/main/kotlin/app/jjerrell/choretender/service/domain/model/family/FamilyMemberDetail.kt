@@ -32,3 +32,9 @@ data class FamilyMemberDetail(
     val invitedDate: Long,
     val isConfirmed: Boolean
 )
+
+@Serializable data class FamilyMemberLeave(val memberId: Long)
+
+@Serializable data class FamilyMemberVerify(val memberId: Long)
+
+@Serializable data class FamilyMemberChangeRole(val memberId: Long, val role: UserType)

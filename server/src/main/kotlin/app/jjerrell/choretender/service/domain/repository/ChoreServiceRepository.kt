@@ -36,7 +36,7 @@ interface IChoreServiceFamilyRepository {
 
     suspend fun changeMemberRole(familyId: Long, detail: FamilyMemberChangeRole): FamilyDetailRead
 
-    suspend fun leaveFamilyGroup(familyId: Long, detail: FamilyDetailLeave): FamilyDetailRead
+    suspend fun leaveFamilyGroup(familyId: Long, detail: FamilyMemberLeave): FamilyDetailRead
 }
 
 interface IChoreServiceUserRepository {
