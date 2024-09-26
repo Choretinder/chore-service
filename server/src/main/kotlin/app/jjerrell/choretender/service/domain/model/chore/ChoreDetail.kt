@@ -17,9 +17,6 @@
  */
 package app.jjerrell.choretender.service.domain.model.chore
 
-import app.jjerrell.choretender.service.domain.model.common.ICreatable
-import app.jjerrell.choretender.service.domain.model.common.IIdentifiable
-import app.jjerrell.choretender.service.domain.model.common.IUpdateable
 import kotlinx.datetime.Clock
 import kotlinx.datetime.Instant
 import kotlinx.serialization.Serializable
@@ -39,41 +36,35 @@ enum class ChoreCompletion {
     DONE
 }
 
-sealed interface ChoreDetail {
-    val name: String
-    val recurrence: ChoreRecurrence
-    val endDate: Instant?
-}
-
 @Serializable
 data class ChoreDetailCreate(
-    override val name: String,
-    override val recurrence: ChoreRecurrence = ChoreRecurrence.NONE,
-    override val createdDate: Long = Clock.System.now().epochSeconds,
-    override val createdBy: Long,
-    override val endDate: Instant? = null,
-) : ChoreDetail, ICreatable
+    val name: String,
+    val recurrence: ChoreRecurrence = ChoreRecurrence.NONE,
+    val createdDate: Long = Clock.System.now().epochSeconds,
+    val createdBy: Long,
+    val endDate: Instant? = null,
+)
 
 @Serializable
 data class ChoreDetailRead(
-    override val id: Long,
-    override val name: String,
-    override val recurrence: ChoreRecurrence,
-    override val createdDate: Long,
-    override val createdBy: Long,
-    override val endDate: Instant?,
+    val id: Long,
+    val name: String,
+    val recurrence: ChoreRecurrence,
+    val createdDate: Long,
+    val createdBy: Long,
+    val endDate: Instant?,
     val status: ChoreCompletion,
-    override val updatedDate: Long?,
-    override val updatedBy: Long?
-) : ChoreDetail, IIdentifiable, ICreatable, IUpdateable
+    val updatedDate: Long?,
+    val updatedBy: Long?
+)
 
 @Serializable
 data class ChoreDetailUpdate(
-    override val id: Long,
-    override val name: String,
-    override val recurrence: ChoreRecurrence,
-    override val endDate: Instant?,
+    val id: Long,
+    val name: String,
+    val recurrence: ChoreRecurrence,
+    val endDate: Instant?,
     val status: ChoreCompletion,
-    override val updatedDate: Long = Clock.System.now().epochSeconds,
-    override val updatedBy: Long
-) : ChoreDetail, IIdentifiable, IUpdateable
+    val updatedDate: Long = Clock.System.now().epochSeconds,
+    val updatedBy: Long
+)

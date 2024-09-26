@@ -18,9 +18,6 @@
 package app.jjerrell.choretender.service.domain.model.user
 
 import app.jjerrell.choretender.service.domain.model.ContactInfo
-import app.jjerrell.choretender.service.domain.model.common.ICreatable
-import app.jjerrell.choretender.service.domain.model.common.IIdentifiable
-import app.jjerrell.choretender.service.domain.model.common.IUpdateable
 import kotlinx.serialization.Serializable
 
 enum class UserType {
@@ -28,51 +25,45 @@ enum class UserType {
     MANAGER
 }
 
-sealed interface UserDetail {
-    val name: String
-    val type: UserType
-    val contactInfo: ContactInfo?
-}
-
 @Serializable
 data class UserDetailCreate(
-    override val name: String,
-    override val type: UserType,
-    override val contactInfo: ContactInfo?,
-    override val createdBy: Long,
-    override val createdDate: Long
-) : UserDetail, ICreatable
+    val name: String,
+    val type: UserType,
+    val contactInfo: ContactInfo?,
+    val createdBy: Long,
+    val createdDate: Long
+)
 
 @Serializable
 data class UserDetailRead(
-    override val id: Long,
-    override val name: String,
-    override val type: UserType,
-    override val contactInfo: ContactInfo?,
-    override val createdBy: Long,
-    override val createdDate: Long,
-    override val updatedDate: Long?,
-    override val updatedBy: Long?
-) : UserDetail, IIdentifiable, ICreatable, IUpdateable
+    val id: Long,
+    val name: String,
+    val type: UserType,
+    val contactInfo: ContactInfo?,
+    val createdBy: Long,
+    val createdDate: Long,
+    val updatedDate: Long?,
+    val updatedBy: Long?
+)
 
 @Serializable
 data class UserDetailUpdate(
-    override val id: Long,
-    override val name: String,
-    override val type: UserType,
-    override val contactInfo: ContactInfo?,
-    override val updatedDate: Long?,
-    override val updatedBy: Long
-) : UserDetail, IIdentifiable, IUpdateable
+    val id: Long,
+    val name: String,
+    val type: UserType,
+    val contactInfo: ContactInfo?,
+    val updatedDate: Long?,
+    val updatedBy: Long
+)
 
 @Serializable
 data class FamilyMemberDetail(
-    override val id: Long,
+    val id: Long,
     val memberId: Long,
-    override val name: String,
-    override val type: UserType,
-    override val contactInfo: ContactInfo?,
+    val name: String,
+    val type: UserType,
+    val contactInfo: ContactInfo?,
     val invitedBy: Long,
     val invitedDate: Long,
     val isConfirmed: Boolean
-) : UserDetail, IIdentifiable
+)

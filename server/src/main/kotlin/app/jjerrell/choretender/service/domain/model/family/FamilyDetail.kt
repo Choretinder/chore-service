@@ -17,43 +17,32 @@
  */
 package app.jjerrell.choretender.service.domain.model.family
 
-import app.jjerrell.choretender.service.domain.model.common.ICreatable
-import app.jjerrell.choretender.service.domain.model.common.IIdentifiable
-import app.jjerrell.choretender.service.domain.model.common.IUpdateable
 import app.jjerrell.choretender.service.domain.model.user.FamilyMemberDetail
 import app.jjerrell.choretender.service.domain.model.user.UserType
 import kotlinx.datetime.Clock
 import kotlinx.serialization.Serializable
 
-sealed interface FamilyDetail {
-    val name: String
-}
-
 @Serializable
 data class FamilyDetailCreate(
-    override val name: String,
+    val name: String,
     val invitees: List<Long>? = null,
-    override val createdBy: Long,
-    override val createdDate: Long = Clock.System.now().epochSeconds
-) : FamilyDetail, ICreatable
+    val createdBy: Long,
+    val createdDate: Long = Clock.System.now().epochSeconds
+)
 
 @Serializable
 data class FamilyDetailRead(
-    override val id: Long,
-    override val name: String,
+    val id: Long,
+    val name: String,
     val invitees: List<FamilyMemberDetail>? = null,
     val members: List<FamilyMemberDetail>,
-    override val createdBy: Long,
-    override val createdDate: Long,
-    override val updatedDate: Long?,
-    override val updatedBy: Long?
-) : FamilyDetail, IIdentifiable, ICreatable, IUpdateable
-
-@Serializable
-data class FamilyDetailInvite(
-    val inviteeId: Long,
-    val invitedBy: Long,
+    val createdBy: Long,
+    val createdDate: Long,
+    val updatedDate: Long?,
+    val updatedBy: Long?
 )
+
+@Serializable data class FamilyDetailInvite(val inviteeId: Long, val invitedBy: Long)
 
 @Serializable data class FamilyDetailLeave(val memberId: Long)
 
