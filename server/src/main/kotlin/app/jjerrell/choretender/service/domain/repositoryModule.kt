@@ -17,6 +17,7 @@
  */
 package app.jjerrell.choretender.service.domain
 
+import app.jjerrell.choretender.service.domain.repository.*
 import app.jjerrell.choretender.service.domain.repository.FamilyRepository
 import app.jjerrell.choretender.service.domain.repository.UserRepository
 import io.ktor.util.logging.*
@@ -28,5 +29,5 @@ val repositoryModule = module {
     single<Logger> { RepositoryLogger() }
     factory<IChoreServiceUserRepository> { UserRepository(db = get(), logger = get()) }
     factory<IChoreServiceFamilyRepository> { FamilyRepository(db = get(), logger = get()) }
-    factory<IChoreServiceChoreRepository> { TODO("Create Chore Repository") }
+    factory<IChoreServiceChoreRepository> { ChoreRepository(db = get(), logger = get()) }
 }

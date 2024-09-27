@@ -17,16 +17,15 @@
  */
 package app.jjerrell.choretender.service.route
 
-import app.jjerrell.choretender.service.domain.IChoreServiceFamilyRepository
+import app.jjerrell.choretender.service.PARAM_FAMILY_ID
 import app.jjerrell.choretender.service.domain.model.family.*
+import app.jjerrell.choretender.service.domain.repository.IChoreServiceFamilyRepository
 import io.ktor.http.*
 import io.ktor.server.application.*
 import io.ktor.server.request.*
 import io.ktor.server.response.*
 import io.ktor.server.routing.*
 import org.koin.ktor.ext.inject
-
-private const val PARAM_FAMILY_ID = "familyId"
 
 internal fun Route.familyRoutes() {
     val familyRepository by inject<IChoreServiceFamilyRepository>()

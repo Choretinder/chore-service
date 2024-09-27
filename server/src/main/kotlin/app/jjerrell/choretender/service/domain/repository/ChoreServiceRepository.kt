@@ -15,7 +15,7 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-package app.jjerrell.choretender.service.domain
+package app.jjerrell.choretender.service.domain.repository
 
 import app.jjerrell.choretender.service.domain.model.chore.ChoreDetailCreate
 import app.jjerrell.choretender.service.domain.model.chore.ChoreDetailRead
@@ -48,9 +48,11 @@ interface IChoreServiceUserRepository {
 }
 
 interface IChoreServiceChoreRepository {
-    suspend fun getChoreDetail(id: Long): ChoreDetailRead?
+    suspend fun getChoreDetail(familyId: Long, choreId: Long): ChoreDetailRead?
 
-    suspend fun createChore(detail: ChoreDetailCreate): ChoreDetailRead?
+    suspend fun getFamilyChoreDetails(familyId: Long): List<ChoreDetailRead>
 
-    suspend fun updateChore(detail: ChoreDetailUpdate): ChoreDetailRead?
+    suspend fun createChore(familyId: Long, detail: ChoreDetailCreate): ChoreDetailRead?
+
+    suspend fun updateChore(familyId: Long, detail: ChoreDetailUpdate): ChoreDetailRead?
 }

@@ -21,7 +21,6 @@ import app.jjerrell.choretender.service.database.ChoreServiceDatabase
 import app.jjerrell.choretender.service.database.entity.FamilyEntity
 import app.jjerrell.choretender.service.database.entity.FamilyMemberEntity
 import app.jjerrell.choretender.service.database.entity.FamilyWithMembers
-import app.jjerrell.choretender.service.domain.IChoreServiceFamilyRepository
 import app.jjerrell.choretender.service.domain.model.family.*
 import app.jjerrell.choretender.service.domain.model.user.UserType
 import io.ktor.server.plugins.*

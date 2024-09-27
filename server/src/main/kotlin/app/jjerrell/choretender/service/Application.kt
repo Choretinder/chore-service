@@ -19,6 +19,7 @@ package app.jjerrell.choretender.service
 
 import app.jjerrell.choretender.service.di.appModule
 import app.jjerrell.choretender.service.domain.repositoryModule
+import app.jjerrell.choretender.service.route.choreRoutes
 import app.jjerrell.choretender.service.route.familyRoutes
 import app.jjerrell.choretender.service.route.userRoutes
 import io.ktor.serialization.kotlinx.json.*
@@ -44,6 +45,7 @@ fun Application.module() {
         route("v1") {
             userRoutes()
             familyRoutes()
+            choreRoutes()
         }
     }
 }

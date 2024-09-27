@@ -17,9 +17,9 @@
  */
 package app.jjerrell.choretender.service.route
 
-import app.jjerrell.choretender.service.domain.IChoreServiceUserRepository
 import app.jjerrell.choretender.service.domain.model.user.UserDetailCreate
 import app.jjerrell.choretender.service.domain.model.user.UserDetailUpdate
+import app.jjerrell.choretender.service.domain.repository.IChoreServiceUserRepository
 import io.ktor.http.*
 import io.ktor.server.application.*
 import io.ktor.server.request.*

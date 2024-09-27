@@ -18,3 +18,6 @@
 package app.jjerrell.choretender.service
 
 const val SERVER_PORT = 8080
+
+const val PARAM_FAMILY_ID = "familyId"
+const val PARAM_CHORE_ID = "choreId"

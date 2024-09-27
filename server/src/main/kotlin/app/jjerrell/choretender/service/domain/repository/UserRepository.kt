@@ -20,7 +20,6 @@ package app.jjerrell.choretender.service.domain.repository
 import app.jjerrell.choretender.service.database.ChoreServiceDatabase
 import app.jjerrell.choretender.service.database.entity.UserEntity
 import app.jjerrell.choretender.service.database.entity.UserEntityContact
-import app.jjerrell.choretender.service.domain.IChoreServiceUserRepository
 import app.jjerrell.choretender.service.domain.model.user.ContactInfo
 import app.jjerrell.choretender.service.domain.model.user.ContactType
 import app.jjerrell.choretender.service.domain.model.user.UserDetailCreate
