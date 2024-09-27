@@ -48,11 +48,11 @@ interface IChoreServiceUserRepository {
 }
 
 interface IChoreServiceChoreRepository {
-    suspend fun getChoreDetail(familyId: Long, choreId: Long): ChoreDetailRead?
+    suspend fun getChoreDetail(familyId: Long, choreId: Long): ChoreDetailRead
 
     suspend fun getFamilyChoreDetails(familyId: Long): List<ChoreDetailRead>
 
-    suspend fun createChore(familyId: Long, detail: ChoreDetailCreate): ChoreDetailRead?
+    suspend fun createChore(familyId: Long, detail: ChoreDetailCreate): ChoreDetailRead
 
-    suspend fun updateChore(familyId: Long, detail: ChoreDetailUpdate): ChoreDetailRead?
+    suspend fun updateChore(familyId: Long, detail: ChoreDetailUpdate): ChoreDetailRead
 }

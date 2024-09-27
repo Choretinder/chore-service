@@ -50,8 +50,7 @@ internal fun Route.choreRoutes() {
             try {
                 call.parameters[PARAM_FAMILY_ID]?.toLongOrNull()?.let { familyId ->
                     call.parameters[PARAM_CHORE_ID]?.toLongOrNull()?.let { choreId ->
-                        val requestedChore = choreRepository.getChoreDetail(familyId = familyId, choreId = choreId)
-                        requestedChore?.let { call.respond(it) }
+                        call.respond(choreRepository.getChoreDetail(familyId = familyId, choreId = choreId))
                     } ?: run { call.respond(HttpStatusCode.BadRequest) }
                 } ?: run { call.respond(HttpStatusCode.BadRequest) }
             } catch (e: ContentTransformationException) {
@@ -63,10 +62,9 @@ internal fun Route.choreRoutes() {
 
         post {
             try {
-                call.parameters[PARAM_FAMILY_ID]?.toLongOrNull()?.let {
+                call.parameters[PARAM_FAMILY_ID]?.toLongOrNull()?.let { familyId ->
                     val choreCreateBody = call.receive<ChoreDetailCreate>()
-                    val newChoreDetail = choreRepository.createChore(it, choreCreateBody)
-                    newChoreDetail?.let { call.respond(it) }
+                    call.respond(choreRepository.createChore(familyId, choreCreateBody))
                 } ?: run { call.respond(HttpStatusCode.BadRequest) }
                 val familyId = requireNotNull(call.parameters[PARAM_FAMILY_ID])
                 call.respondText("Created Chore for family ID: $familyId")
@@ -81,8 +79,7 @@ internal fun Route.choreRoutes() {
             try {
                 val familyId = requireNotNull(call.parameters[PARAM_FAMILY_ID]?.toLongOrNull())
                 val choreUpdateBody = call.receive<ChoreDetailUpdate>()
-                val updatedChoreDetail = choreRepository.updateChore(familyId, choreUpdateBody)
-                updatedChoreDetail?.let { call.respond(it) }
+                call.respond(choreRepository.updateChore(familyId, choreUpdateBody))
             } catch (e: ContentTransformationException) {
                 call.respond(HttpStatusCode.BadRequest)
             } catch (e: Throwable) {

@@ -25,7 +25,7 @@ import io.ktor.util.logging.*
 internal class ChoreRepository(private val db: ChoreServiceDatabase, private val logger: Logger) :
     IChoreServiceChoreRepository {
 
-    override suspend fun getChoreDetail(familyId: Long, choreId: Long): ChoreDetailRead? {
+    override suspend fun getChoreDetail(familyId: Long, choreId: Long): ChoreDetailRead {
         return db.familyDao().getChore(familyId, choreId)
             .convertToDetail()
     }
@@ -34,13 +34,13 @@ internal class ChoreRepository(private val db: ChoreServiceDatabase, private val
         return db.familyDao().getFamilyWithChores(familyId).chores.map { it.convertToDetail() }
     }
 
-    override suspend fun createChore(familyId: Long, detail: ChoreDetailCreate): ChoreDetailRead? {
+    override suspend fun createChore(familyId: Long, detail: ChoreDetailCreate): ChoreDetailRead {
         val createdChoreId = db.familyDao().insertChore(detail.convertToEntity(familyId))
         return db.familyDao().getChore(familyId = familyId, choreId = createdChoreId)
             .convertToDetail()
     }
 
-    override suspend fun updateChore(familyId: Long, detail: ChoreDetailUpdate): ChoreDetailRead? {
+    override suspend fun updateChore(familyId: Long, detail: ChoreDetailUpdate): ChoreDetailRead {
         // Mutate the Chore in memory
         val existingChoreEntityUpdated = db.familyDao().getChore(familyId = familyId, choreId = detail.id)
             .updateWith(detail)
