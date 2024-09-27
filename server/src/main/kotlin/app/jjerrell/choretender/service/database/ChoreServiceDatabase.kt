@@ -30,7 +30,8 @@ import app.jjerrell.choretender.service.database.entity.UserEntity
 import kotlinx.coroutines.Dispatchers
 
 @Database(
-    entities = [UserEntity::class, FamilyEntity::class, FamilyMemberEntity::class, ChoreEntity::class],
+    entities =
+        [UserEntity::class, FamilyEntity::class, FamilyMemberEntity::class, ChoreEntity::class],
     version = 1
 )
 abstract class ChoreServiceDatabase : RoomDatabase() {

@@ -21,14 +21,15 @@ import androidx.room.*
 
 @Entity(
     tableName = "chore",
-    foreignKeys = [
-        ForeignKey(
-            entity = FamilyEntity::class,
-            parentColumns = ["familyId"],
-            childColumns = ["familyId"],
-            onDelete = ForeignKey.CASCADE
-        )
-    ],
+    foreignKeys =
+        [
+            ForeignKey(
+                entity = FamilyEntity::class,
+                parentColumns = ["familyId"],
+                childColumns = ["familyId"],
+                onDelete = ForeignKey.CASCADE
+            )
+        ],
     indices = [Index(value = ["familyId"])]
 )
 data class ChoreEntity(
@@ -46,9 +47,5 @@ data class ChoreEntity(
 
 data class FamilyWithChores(
     @Embedded val family: FamilyEntity,
-    @Relation(
-        parentColumn = "familyId",
-        entityColumn = "familyId"
-    )
-    val chores: List<ChoreEntity>
+    @Relation(parentColumn = "familyId", entityColumn = "familyId") val chores: List<ChoreEntity>
 )

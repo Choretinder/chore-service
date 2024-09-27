@@ -38,7 +38,8 @@ internal fun Route.choreRoutes() {
                 call.parameters[PARAM_FAMILY_ID]?.toLongOrNull()?.let {
                     val familyChores = choreRepository.getFamilyChoreDetails(it)
                     call.respond(familyChores)
-                } ?: run { call.respond(HttpStatusCode.BadRequest) }
+                }
+                    ?: run { call.respond(HttpStatusCode.BadRequest) }
             } catch (e: ContentTransformationException) {
                 call.respond(HttpStatusCode.BadRequest)
             } catch (e: Throwable) {
@@ -50,9 +51,13 @@ internal fun Route.choreRoutes() {
             try {
                 call.parameters[PARAM_FAMILY_ID]?.toLongOrNull()?.let { familyId ->
                     call.parameters[PARAM_CHORE_ID]?.toLongOrNull()?.let { choreId ->
-                        call.respond(choreRepository.getChoreDetail(familyId = familyId, choreId = choreId))
-                    } ?: run { call.respond(HttpStatusCode.BadRequest) }
-                } ?: run { call.respond(HttpStatusCode.BadRequest) }
+                        call.respond(
+                            choreRepository.getChoreDetail(familyId = familyId, choreId = choreId)
+                        )
+                    }
+                        ?: run { call.respond(HttpStatusCode.BadRequest) }
+                }
+                    ?: run { call.respond(HttpStatusCode.BadRequest) }
             } catch (e: ContentTransformationException) {
                 call.respond(HttpStatusCode.BadRequest)
             } catch (e: Throwable) {
@@ -65,7 +70,8 @@ internal fun Route.choreRoutes() {
                 call.parameters[PARAM_FAMILY_ID]?.toLongOrNull()?.let { familyId ->
                     val choreCreateBody = call.receive<ChoreDetailCreate>()
                     call.respond(choreRepository.createChore(familyId, choreCreateBody))
-                } ?: run { call.respond(HttpStatusCode.BadRequest) }
+                }
+                    ?: run { call.respond(HttpStatusCode.BadRequest) }
                 val familyId = requireNotNull(call.parameters[PARAM_FAMILY_ID])
                 call.respondText("Created Chore for family ID: $familyId")
             } catch (e: ContentTransformationException) {

@@ -23,7 +23,7 @@ import app.jjerrell.choretender.service.database.entity.*
 @Dao
 interface FamilyDao {
 
-    //region Family and Members
+    // region Family and Members
     @Insert(onConflict = OnConflictStrategy.REPLACE)
     suspend fun insertFamily(family: FamilyEntity): Long
 
@@ -38,13 +38,12 @@ interface FamilyDao {
     @Transaction
     @Query("SELECT * FROM family WHERE familyId = :familyId")
     suspend fun getFamilyWithMembers(familyId: Long): FamilyWithMembers
-    //endregion
-    //region Family Chores
+    // endregion
+    // region Family Chores
     @Insert(onConflict = OnConflictStrategy.REPLACE)
     suspend fun insertChore(chore: ChoreEntity): Long
 
-    @Update
-    suspend fun updateChore(chore: ChoreEntity): Int
+    @Update suspend fun updateChore(chore: ChoreEntity): Int
 
     @Transaction
     @Query("SELECT * FROM chore WHERE familyId = :familyId AND choreId = :choreId")
@@ -53,5 +52,5 @@ interface FamilyDao {
     @Transaction
     @Query("SELECT * FROM family WHERE familyId = :familyId")
     suspend fun getFamilyWithChores(familyId: Long): FamilyWithChores
-    //endregion
+    // endregion
 }
