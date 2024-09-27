@@ -45,8 +45,7 @@ internal fun Route.userRoutes() {
                     ?: run { call.respond(HttpStatusCode.BadRequest) }
             } catch (e: Throwable) {
                 call.respond(
-                    HttpStatusCode.InternalServerError,
-                    "Unexpected Failure.\n${e.message}"
+                    HttpStatusCode.InternalServerError
                 )
             }
         }
