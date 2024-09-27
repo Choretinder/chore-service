@@ -18,7 +18,6 @@
 package app.jjerrell.choretender.service.domain.model.chore
 
 import kotlinx.datetime.Clock
-import kotlinx.datetime.Instant
 import kotlinx.serialization.Serializable
 
 enum class ChoreRecurrence {
@@ -42,7 +41,7 @@ data class ChoreDetailCreate(
     val recurrence: ChoreRecurrence = ChoreRecurrence.NONE,
     val createdDate: Long = Clock.System.now().epochSeconds,
     val createdBy: Long,
-    val endDate: Instant? = null,
+    val endDate: Long? = null,
 )
 
 @Serializable
@@ -52,7 +51,7 @@ data class ChoreDetailRead(
     val recurrence: ChoreRecurrence,
     val createdDate: Long,
     val createdBy: Long,
-    val endDate: Instant?,
+    val endDate: Long?,
     val status: ChoreCompletion,
     val updatedDate: Long?,
     val updatedBy: Long?
@@ -61,10 +60,10 @@ data class ChoreDetailRead(
 @Serializable
 data class ChoreDetailUpdate(
     val id: Long,
-    val name: String,
-    val recurrence: ChoreRecurrence,
-    val endDate: Instant?,
-    val status: ChoreCompletion,
+    val name: String? = null,
+    val recurrence: ChoreRecurrence? = null,
+    val endDate: Long? = null,
+    val status: ChoreCompletion? = null,
     val updatedDate: Long = Clock.System.now().epochSeconds,
     val updatedBy: Long
 )

@@ -30,7 +30,6 @@ import io.ktor.server.routing.*
 import org.koin.ktor.ext.inject
 
 internal fun Route.choreRoutes() {
-    // TODO: Implement
     val choreRepository by inject<IChoreServiceChoreRepository>()
 
     route("family/{$PARAM_FAMILY_ID}/chore") {
@@ -39,8 +38,7 @@ internal fun Route.choreRoutes() {
                 call.parameters[PARAM_FAMILY_ID]?.toLongOrNull()?.let {
                     val familyChores = choreRepository.getFamilyChoreDetails(it)
                     call.respond(familyChores)
-                }
-                    ?: run { call.respond(HttpStatusCode.BadRequest) }
+                } ?: run { call.respond(HttpStatusCode.BadRequest) }
             } catch (e: ContentTransformationException) {
                 call.respond(HttpStatusCode.BadRequest)
             } catch (e: Throwable) {
@@ -52,13 +50,10 @@ internal fun Route.choreRoutes() {
             try {
                 call.parameters[PARAM_FAMILY_ID]?.toLongOrNull()?.let { familyId ->
                     call.parameters[PARAM_CHORE_ID]?.toLongOrNull()?.let { choreId ->
-                        val requestedChore =
-                            choreRepository.getChoreDetail(familyId = familyId, choreId = choreId)
+                        val requestedChore = choreRepository.getChoreDetail(familyId = familyId, choreId = choreId)
                         requestedChore?.let { call.respond(it) }
-                    }
-                        ?: run { call.respond(HttpStatusCode.BadRequest) }
-                }
-                    ?: run { call.respond(HttpStatusCode.BadRequest) }
+                    } ?: run { call.respond(HttpStatusCode.BadRequest) }
+                } ?: run { call.respond(HttpStatusCode.BadRequest) }
             } catch (e: ContentTransformationException) {
                 call.respond(HttpStatusCode.BadRequest)
             } catch (e: Throwable) {
@@ -72,8 +67,7 @@ internal fun Route.choreRoutes() {
                     val choreCreateBody = call.receive<ChoreDetailCreate>()
                     val newChoreDetail = choreRepository.createChore(it, choreCreateBody)
                     newChoreDetail?.let { call.respond(it) }
-                }
-                    ?: run { call.respond(HttpStatusCode.BadRequest) }
+                } ?: run { call.respond(HttpStatusCode.BadRequest) }
                 val familyId = requireNotNull(call.parameters[PARAM_FAMILY_ID])
                 call.respondText("Created Chore for family ID: $familyId")
             } catch (e: ContentTransformationException) {

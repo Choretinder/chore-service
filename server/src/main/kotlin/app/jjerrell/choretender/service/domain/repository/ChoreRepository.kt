@@ -18,35 +18,71 @@
 package app.jjerrell.choretender.service.domain.repository
 
 import app.jjerrell.choretender.service.database.ChoreServiceDatabase
-import app.jjerrell.choretender.service.domain.model.chore.ChoreDetailCreate
-import app.jjerrell.choretender.service.domain.model.chore.ChoreDetailRead
-import app.jjerrell.choretender.service.domain.model.chore.ChoreDetailUpdate
+import app.jjerrell.choretender.service.database.entity.ChoreEntity
+import app.jjerrell.choretender.service.domain.model.chore.*
 import io.ktor.util.logging.*
 
 internal class ChoreRepository(private val db: ChoreServiceDatabase, private val logger: Logger) :
     IChoreServiceChoreRepository {
 
     override suspend fun getChoreDetail(familyId: Long, choreId: Long): ChoreDetailRead? {
-        val family = db.familyDao().getFamilyWithMembers(familyId)
-
-        return null
+        return db.familyDao().getChore(familyId, choreId)
+            .convertToDetail()
     }
 
     override suspend fun getFamilyChoreDetails(familyId: Long): List<ChoreDetailRead> {
-        val family = db.familyDao().getFamilyWithMembers(familyId)
-
-        return listOf()
+        return db.familyDao().getFamilyWithChores(familyId).chores.map { it.convertToDetail() }
     }
 
     override suspend fun createChore(familyId: Long, detail: ChoreDetailCreate): ChoreDetailRead? {
-        val family = db.familyDao().getFamilyWithMembers(familyId)
-
-        return null
+        val createdChoreId = db.familyDao().insertChore(detail.convertToEntity(familyId))
+        return db.familyDao().getChore(familyId = familyId, choreId = createdChoreId)
+            .convertToDetail()
     }
 
     override suspend fun updateChore(familyId: Long, detail: ChoreDetailUpdate): ChoreDetailRead? {
-        val family = db.familyDao().getFamilyWithMembers(familyId)
+        // Mutate the Chore in memory
+        val existingChoreEntityUpdated = db.familyDao().getChore(familyId = familyId, choreId = detail.id)
+            .updateWith(detail)
 
-        return null
+        // Update the Chore in the database
+        db.familyDao().updateChore(existingChoreEntityUpdated)
+
+        // Return the updated Chore
+        return db.familyDao().getChore(familyId = familyId, choreId = existingChoreEntityUpdated.choreId)
+            .convertToDetail()
     }
 }
+
+private fun ChoreEntity.convertToDetail() = ChoreDetailRead(
+    id = choreId,
+    name = name,
+    recurrence = ChoreRecurrence.valueOf(recurrence),
+    createdDate = createdDate,
+    createdBy = createdBy,
+    endDate = endDate,
+    status = ChoreCompletion.valueOf(status),
+    updatedBy = updatedBy,
+    updatedDate = updatedDate
+)
+
+private fun ChoreDetailCreate.convertToEntity(familyId: Long) = ChoreEntity(
+    familyId = familyId,
+    name = name,
+    recurrence = recurrence.name,
+    status = ChoreCompletion.NONE.name,
+    endDate = endDate,
+    createdBy = createdBy,
+    createdDate = createdDate,
+    updatedBy = null,
+    updatedDate = null
+)
+
+private fun ChoreEntity.updateWith(update: ChoreDetailUpdate) = copy(
+    name = update.name ?: name,
+    recurrence = update.recurrence?.name ?: recurrence,
+    endDate = update.endDate ?: endDate,
+    status = update.status?.name ?: status,
+    updatedDate = update.updatedDate,
+    updatedBy = update.updatedBy
+)

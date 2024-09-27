@@ -23,14 +23,15 @@ import androidx.room.RoomDatabase
 import androidx.sqlite.driver.bundled.BundledSQLiteDriver
 import app.jjerrell.choretender.service.database.dao.FamilyDao
 import app.jjerrell.choretender.service.database.dao.UserDao
+import app.jjerrell.choretender.service.database.entity.ChoreEntity
 import app.jjerrell.choretender.service.database.entity.FamilyEntity
 import app.jjerrell.choretender.service.database.entity.FamilyMemberEntity
 import app.jjerrell.choretender.service.database.entity.UserEntity
 import kotlinx.coroutines.Dispatchers
 
 @Database(
-    entities = [UserEntity::class, FamilyEntity::class, FamilyMemberEntity::class],
-    version = 8
+    entities = [UserEntity::class, FamilyEntity::class, FamilyMemberEntity::class, ChoreEntity::class],
+    version = 1
 )
 abstract class ChoreServiceDatabase : RoomDatabase() {
     abstract fun userDao(): UserDao

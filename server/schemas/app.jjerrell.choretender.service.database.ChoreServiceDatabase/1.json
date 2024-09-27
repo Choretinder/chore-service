@@ -2,15 +2,15 @@
   "formatVersion": 1,
   "database": {
     "version": 1,
-    "identityHash": "36b4799878333e91b91090420f08b415",
+    "identityHash": "c3bf5c9a7a4e3209cacd34708e58f671",
     "entities": [
       {
         "tableName": "UserEntity",
-        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`id` INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL, `name` TEXT NOT NULL, `type` TEXT NOT NULL)",
+        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`userId` INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL, `name` TEXT NOT NULL, `userType` TEXT NOT NULL, `createdBy` INTEGER NOT NULL, `createdDateSeconds` INTEGER NOT NULL, `updatedDateSeconds` INTEGER, `updatedBy` INTEGER, `contact_resource` TEXT, `contact_contactType` TEXT, `contact_isVerified` INTEGER)",
         "fields": [
           {
-            "fieldPath": "id",
-            "columnName": "id",
+            "fieldPath": "userId",
+            "columnName": "userId",
             "affinity": "INTEGER",
             "notNull": true
           },
@@ -21,23 +21,326 @@
             "notNull": true
           },
           {
-            "fieldPath": "type",
-            "columnName": "type",
+            "fieldPath": "userType",
+            "columnName": "userType",
             "affinity": "TEXT",
             "notNull": true
+          },
+          {
+            "fieldPath": "createdBy",
+            "columnName": "createdBy",
+            "affinity": "INTEGER",
+            "notNull": true
+          },
+          {
+            "fieldPath": "createdDateSeconds",
+            "columnName": "createdDateSeconds",
+            "affinity": "INTEGER",
+            "notNull": true
+          },
+          {
+            "fieldPath": "updatedDateSeconds",
+            "columnName": "updatedDateSeconds",
+            "affinity": "INTEGER"
+          },
+          {
+            "fieldPath": "updatedBy",
+            "columnName": "updatedBy",
+            "affinity": "INTEGER"
+          },
+          {
+            "fieldPath": "contact.resource",
+            "columnName": "contact_resource",
+            "affinity": "TEXT"
+          },
+          {
+            "fieldPath": "contact.contactType",
+            "columnName": "contact_contactType",
+            "affinity": "TEXT"
+          },
+          {
+            "fieldPath": "contact.isVerified",
+            "columnName": "contact_isVerified",
+            "affinity": "INTEGER"
           }
         ],
         "primaryKey": {
           "autoGenerate": true,
           "columnNames": [
-            "id"
+            "userId"
           ]
         }
+      },
+      {
+        "tableName": "family",
+        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`familyId` INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL, `familyName` TEXT NOT NULL, `createdBy` INTEGER NOT NULL, `createdDate` INTEGER NOT NULL, `updatedBy` INTEGER, `updatedDate` INTEGER)",
+        "fields": [
+          {
+            "fieldPath": "familyId",
+            "columnName": "familyId",
+            "affinity": "INTEGER",
+            "notNull": true
+          },
+          {
+            "fieldPath": "familyName",
+            "columnName": "familyName",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "createdBy",
+            "columnName": "createdBy",
+            "affinity": "INTEGER",
+            "notNull": true
+          },
+          {
+            "fieldPath": "createdDate",
+            "columnName": "createdDate",
+            "affinity": "INTEGER",
+            "notNull": true
+          },
+          {
+            "fieldPath": "updatedBy",
+            "columnName": "updatedBy",
+            "affinity": "INTEGER"
+          },
+          {
+            "fieldPath": "updatedDate",
+            "columnName": "updatedDate",
+            "affinity": "INTEGER"
+          }
+        ],
+        "primaryKey": {
+          "autoGenerate": true,
+          "columnNames": [
+            "familyId"
+          ]
+        }
+      },
+      {
+        "tableName": "family_member",
+        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`memberId` INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL, `familyId` INTEGER NOT NULL, `role` TEXT NOT NULL, `isConfirmed` INTEGER NOT NULL, `invitedBy` INTEGER NOT NULL, `invitedDate` INTEGER NOT NULL, `userId` INTEGER NOT NULL, `name` TEXT NOT NULL, `userType` TEXT NOT NULL, `createdBy` INTEGER NOT NULL, `createdDateSeconds` INTEGER NOT NULL, `updatedDateSeconds` INTEGER, `updatedBy` INTEGER, `contact_resource` TEXT, `contact_contactType` TEXT, `contact_isVerified` INTEGER, FOREIGN KEY(`familyId`) REFERENCES `family`(`familyId`) ON UPDATE NO ACTION ON DELETE CASCADE )",
+        "fields": [
+          {
+            "fieldPath": "memberId",
+            "columnName": "memberId",
+            "affinity": "INTEGER",
+            "notNull": true
+          },
+          {
+            "fieldPath": "familyId",
+            "columnName": "familyId",
+            "affinity": "INTEGER",
+            "notNull": true
+          },
+          {
+            "fieldPath": "role",
+            "columnName": "role",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "isConfirmed",
+            "columnName": "isConfirmed",
+            "affinity": "INTEGER",
+            "notNull": true
+          },
+          {
+            "fieldPath": "invitedBy",
+            "columnName": "invitedBy",
+            "affinity": "INTEGER",
+            "notNull": true
+          },
+          {
+            "fieldPath": "invitedDate",
+            "columnName": "invitedDate",
+            "affinity": "INTEGER",
+            "notNull": true
+          },
+          {
+            "fieldPath": "user.userId",
+            "columnName": "userId",
+            "affinity": "INTEGER",
+            "notNull": true
+          },
+          {
+            "fieldPath": "user.name",
+            "columnName": "name",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "user.userType",
+            "columnName": "userType",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "user.createdBy",
+            "columnName": "createdBy",
+            "affinity": "INTEGER",
+            "notNull": true
+          },
+          {
+            "fieldPath": "user.createdDateSeconds",
+            "columnName": "createdDateSeconds",
+            "affinity": "INTEGER",
+            "notNull": true
+          },
+          {
+            "fieldPath": "user.updatedDateSeconds",
+            "columnName": "updatedDateSeconds",
+            "affinity": "INTEGER"
+          },
+          {
+            "fieldPath": "user.updatedBy",
+            "columnName": "updatedBy",
+            "affinity": "INTEGER"
+          },
+          {
+            "fieldPath": "user.contact.resource",
+            "columnName": "contact_resource",
+            "affinity": "TEXT"
+          },
+          {
+            "fieldPath": "user.contact.contactType",
+            "columnName": "contact_contactType",
+            "affinity": "TEXT"
+          },
+          {
+            "fieldPath": "user.contact.isVerified",
+            "columnName": "contact_isVerified",
+            "affinity": "INTEGER"
+          }
+        ],
+        "primaryKey": {
+          "autoGenerate": true,
+          "columnNames": [
+            "memberId"
+          ]
+        },
+        "indices": [
+          {
+            "name": "index_family_member_familyId",
+            "unique": false,
+            "columnNames": [
+              "familyId"
+            ],
+            "orders": [],
+            "createSql": "CREATE INDEX IF NOT EXISTS `index_family_member_familyId` ON `${TABLE_NAME}` (`familyId`)"
+          }
+        ],
+        "foreignKeys": [
+          {
+            "table": "family",
+            "onDelete": "CASCADE",
+            "onUpdate": "NO ACTION",
+            "columns": [
+              "familyId"
+            ],
+            "referencedColumns": [
+              "familyId"
+            ]
+          }
+        ]
+      },
+      {
+        "tableName": "chore",
+        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`choreId` INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL, `familyId` INTEGER NOT NULL, `name` TEXT NOT NULL, `recurrence` TEXT NOT NULL, `status` TEXT NOT NULL, `endDate` INTEGER, `createdBy` INTEGER NOT NULL, `createdDate` INTEGER NOT NULL, `updatedBy` INTEGER, `updatedDate` INTEGER, FOREIGN KEY(`familyId`) REFERENCES `family`(`familyId`) ON UPDATE NO ACTION ON DELETE CASCADE )",
+        "fields": [
+          {
+            "fieldPath": "choreId",
+            "columnName": "choreId",
+            "affinity": "INTEGER",
+            "notNull": true
+          },
+          {
+            "fieldPath": "familyId",
+            "columnName": "familyId",
+            "affinity": "INTEGER",
+            "notNull": true
+          },
+          {
+            "fieldPath": "name",
+            "columnName": "name",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "recurrence",
+            "columnName": "recurrence",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "status",
+            "columnName": "status",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "endDate",
+            "columnName": "endDate",
+            "affinity": "INTEGER"
+          },
+          {
+            "fieldPath": "createdBy",
+            "columnName": "createdBy",
+            "affinity": "INTEGER",
+            "notNull": true
+          },
+          {
+            "fieldPath": "createdDate",
+            "columnName": "createdDate",
+            "affinity": "INTEGER",
+            "notNull": true
+          },
+          {
+            "fieldPath": "updatedBy",
+            "columnName": "updatedBy",
+            "affinity": "INTEGER"
+          },
+          {
+            "fieldPath": "updatedDate",
+            "columnName": "updatedDate",
+            "affinity": "INTEGER"
+          }
+        ],
+        "primaryKey": {
+          "autoGenerate": true,
+          "columnNames": [
+            "choreId"
+          ]
+        },
+        "indices": [
+          {
+            "name": "index_chore_familyId",
+            "unique": false,
+            "columnNames": [
+              "familyId"
+            ],
+            "orders": [],
+            "createSql": "CREATE INDEX IF NOT EXISTS `index_chore_familyId` ON `${TABLE_NAME}` (`familyId`)"
+          }
+        ],
+        "foreignKeys": [
+          {
+            "table": "family",
+            "onDelete": "CASCADE",
+            "onUpdate": "NO ACTION",
+            "columns": [
+              "familyId"
+            ],
+            "referencedColumns": [
+              "familyId"
+            ]
+          }
+        ]
       }
     ],
     "setupQueries": [
       "CREATE TABLE IF NOT EXISTS room_master_table (id INTEGER PRIMARY KEY,identity_hash TEXT)",
-      "INSERT OR REPLACE INTO room_master_table (id,identity_hash) VALUES(42, '36b4799878333e91b91090420f08b415')"
+      "INSERT OR REPLACE INTO room_master_table (id,identity_hash) VALUES(42, 'c3bf5c9a7a4e3209cacd34708e58f671')"
     ]
   }
 }

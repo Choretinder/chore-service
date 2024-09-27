@@ -16,3 +16,39 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 package app.jjerrell.choretender.service.database.entity
+
+import androidx.room.*
+
+@Entity(
+    tableName = "chore",
+    foreignKeys = [
+        ForeignKey(
+            entity = FamilyEntity::class,
+            parentColumns = ["familyId"],
+            childColumns = ["familyId"],
+            onDelete = ForeignKey.CASCADE
+        )
+    ],
+    indices = [Index(value = ["familyId"])]
+)
+data class ChoreEntity(
+    @PrimaryKey(autoGenerate = true) val choreId: Long = 0,
+    val familyId: Long,
+    val name: String,
+    val recurrence: String,
+    val status: String,
+    val endDate: Long?,
+    val createdBy: Long,
+    val createdDate: Long,
+    val updatedBy: Long?,
+    val updatedDate: Long?
+)
+
+data class FamilyWithChores(
+    @Embedded val family: FamilyEntity,
+    @Relation(
+        parentColumn = "familyId",
+        entityColumn = "familyId"
+    )
+    val chores: List<ChoreEntity>
+)
