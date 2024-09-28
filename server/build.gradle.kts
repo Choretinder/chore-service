@@ -69,4 +69,11 @@ tasks.jacocoTestReport {
         csv.required.set(false)
         html.required.set(true) // Optional: Enable HTML reports
     }
+    classDirectories.setFrom(
+        files(
+            classDirectories.files.map {
+                fileTree(it) { exclude("**/generated/**", "**/database/**") }
+            }
+        )
+    )
 }
