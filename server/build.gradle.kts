@@ -58,9 +58,7 @@ dependencies {
 
 room { schemaDirectory("$projectDir/schemas") }
 
-jacoco {
-    toolVersion = "0.8.8"
-}
+jacoco { toolVersion = "0.8.8" }
 
 tasks.withType<Test> {
     useJUnitPlatform()
@@ -70,8 +68,8 @@ tasks.withType<Test> {
 tasks.jacocoTestReport {
     dependsOn("test") // Ensure tests run before generating report
     reports {
-        xml.required.set(true)    // Enable XML reports
+        xml.required.set(true) // Enable XML reports
         csv.required.set(false)
-        html.required.set(true)   // Optional: Enable HTML reports
+        html.required.set(true) // Optional: Enable HTML reports
     }
 }
