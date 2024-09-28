@@ -17,20 +17,28 @@
  */
 package app.jjerrell.choretender.service.route
 
+import app.jjerrell.choretender.service.domain.model.family.FamilyDetailRead
+import app.jjerrell.choretender.service.domain.repository.IChoreServiceFamilyRepository
 import app.jjerrell.choretender.service.setupPlugins
 import app.jjerrell.choretender.service.util.TestData
+import io.ktor.client.call.*
 import io.ktor.client.plugins.contentnegotiation.*
 import io.ktor.client.request.*
 import io.ktor.client.statement.*
 import io.ktor.http.*
 import io.ktor.serialization.kotlinx.json.*
+import io.ktor.server.application.*
 import io.ktor.server.routing.*
 import io.ktor.server.testing.*
+import io.mockk.coEvery
+import io.mockk.mockk
 import io.mockk.unmockkAll
 import kotlin.test.Test
 import kotlin.test.assertEquals
 import org.junit.After
 import org.koin.core.context.stopKoin
+import org.koin.dsl.module
+import org.koin.ktor.plugin.Koin
 
 class FamilyRoutesTest {
     @After
@@ -143,5 +151,194 @@ class FamilyRoutesTest {
                 setBody(TestData.familyMemberPromote)
             }
         assertEquals(HttpStatusCode.InternalServerError, promoteMemberResponse.status)
+    }
+
+    @Test
+    fun `testFamilyRoutes createFamily`() = testApplication {
+        val client = createClient { install(ContentNegotiation) { json() } }
+        application {
+            setupPlugins()
+            install(Koin) {
+                modules(
+                    module {
+                        factory<IChoreServiceFamilyRepository> {
+                            mockk {
+                                coEvery { createFamily(TestData.familyDetailCreate) } returns
+                                    TestData.familyDetailRead
+                            }
+                        }
+                    }
+                )
+            }
+            routing { route("test") { familyRoutes() } }
+        }
+
+        val createFamilyResponse =
+            client.post("test/family") {
+                contentType(ContentType.Application.Json)
+                setBody(TestData.familyDetailCreate)
+            }
+        assertEquals(HttpStatusCode.OK, createFamilyResponse.status)
+        assertEquals(TestData.familyDetailRead, createFamilyResponse.body<FamilyDetailRead>())
+    }
+
+    @Test
+    fun `testFamilyRoutes getFamily`() = testApplication {
+        val client = createClient { install(ContentNegotiation) { json() } }
+        application {
+            setupPlugins()
+            install(Koin) {
+                modules(
+                    module {
+                        factory<IChoreServiceFamilyRepository> {
+                            mockk {
+                                coEvery { getFamilyDetail(id = 1) } returns
+                                    TestData.familyDetailRead
+                            }
+                        }
+                    }
+                )
+            }
+            routing { route("test") { familyRoutes() } }
+        }
+
+        val getFamilyResponse = client.get("test/family/1")
+        assertEquals(HttpStatusCode.OK, getFamilyResponse.status)
+        assertEquals(TestData.familyDetailRead, getFamilyResponse.body<FamilyDetailRead>())
+    }
+
+    @Test
+    fun `testFamilyRoutes inviteToFamily`() = testApplication {
+        val client = createClient { install(ContentNegotiation) { json() } }
+        application {
+            setupPlugins()
+            install(Koin) {
+                modules(
+                    module {
+                        factory<IChoreServiceFamilyRepository> {
+                            mockk {
+                                coEvery {
+                                    inviteFamilyMember(
+                                        familyId = 1,
+                                        detail = TestData.familyDetailInvite
+                                    )
+                                } returns TestData.familyDetailRead
+                            }
+                        }
+                    }
+                )
+            }
+            routing { route("test") { familyRoutes() } }
+        }
+
+        val inviteFamilyResponse =
+            client.post("test/family/1/invite") {
+                contentType(ContentType.Application.Json)
+                setBody(TestData.familyDetailInvite)
+            }
+        assertEquals(HttpStatusCode.OK, inviteFamilyResponse.status)
+        assertEquals(TestData.familyDetailRead, inviteFamilyResponse.body<FamilyDetailRead>())
+    }
+
+    @Test
+    fun `testFamilyRoutes leaveFamily`() = testApplication {
+        val client = createClient { install(ContentNegotiation) { json() } }
+        application {
+            setupPlugins()
+            install(Koin) {
+                modules(
+                    module {
+                        factory<IChoreServiceFamilyRepository> {
+                            mockk {
+                                coEvery {
+                                    leaveFamilyGroup(
+                                        familyId = 1,
+                                        detail = TestData.familyDetailLeave
+                                    )
+                                } returns TestData.familyDetailRead
+                            }
+                        }
+                    }
+                )
+            }
+            routing { route("test") { familyRoutes() } }
+        }
+
+        val leaveFamilyResponse =
+            client.post("test/family/1/leave") {
+                contentType(ContentType.Application.Json)
+                setBody(TestData.familyDetailLeave)
+            }
+        assertEquals(HttpStatusCode.OK, leaveFamilyResponse.status)
+        assertEquals(TestData.familyDetailRead, leaveFamilyResponse.body<FamilyDetailRead>())
+    }
+
+    @Test
+    fun `testFamilyRoutes verifyFamilyMember`() = testApplication {
+        val client = createClient { install(ContentNegotiation) { json() } }
+        application {
+            setupPlugins()
+            install(Koin) {
+                modules(
+                    module {
+                        factory<IChoreServiceFamilyRepository> {
+                            mockk {
+                                coEvery {
+                                    verifyFamilyMember(
+                                        familyId = 1,
+                                        detail = TestData.familyMemberVerify
+                                    )
+                                } returns TestData.familyDetailRead
+                            }
+                        }
+                    }
+                )
+            }
+            routing { route("test") { familyRoutes() } }
+        }
+
+        val verifyFamilyMemberResponse =
+            client.post("test/family/1/verify") {
+                contentType(ContentType.Application.Json)
+                setBody(TestData.familyMemberVerify)
+            }
+        assertEquals(HttpStatusCode.OK, verifyFamilyMemberResponse.status)
+        assertEquals(TestData.familyDetailRead, verifyFamilyMemberResponse.body<FamilyDetailRead>())
+    }
+
+    @Test
+    fun `testFamilyRoutes promoteFamilyMember`() = testApplication {
+        val client = createClient { install(ContentNegotiation) { json() } }
+        application {
+            setupPlugins()
+            install(Koin) {
+                modules(
+                    module {
+                        factory<IChoreServiceFamilyRepository> {
+                            mockk {
+                                coEvery {
+                                    changeMemberRole(
+                                        familyId = 1,
+                                        detail = TestData.familyMemberPromote
+                                    )
+                                } returns TestData.familyDetailRead
+                            }
+                        }
+                    }
+                )
+            }
+            routing { route("test") { familyRoutes() } }
+        }
+
+        val promoteFamilyMemberResponse =
+            client.post("test/family/1/role") {
+                contentType(ContentType.Application.Json)
+                setBody(TestData.familyMemberPromote)
+            }
+        assertEquals(HttpStatusCode.OK, promoteFamilyMemberResponse.status)
+        assertEquals(
+            TestData.familyDetailRead,
+            promoteFamilyMemberResponse.body<FamilyDetailRead>()
+        )
     }
 }

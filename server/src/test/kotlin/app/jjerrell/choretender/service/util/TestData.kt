@@ -37,6 +37,30 @@ data object TestData {
     val familyDetailCreate =
         FamilyDetailCreate(name = "Test", invitees = null, createdBy = 1, createdDate = 0)
 
+    val familyDetailRead =
+        FamilyDetailRead(
+            id = 1,
+            name = "Test",
+            invitees = null,
+            members =
+                listOf(
+                    FamilyMemberDetail(
+                        id = 1,
+                        memberId = 1,
+                        name = "Test",
+                        type = UserType.MANAGER,
+                        contactInfo = null,
+                        invitedBy = 0,
+                        invitedDate = 0,
+                        isConfirmed = true
+                    )
+                ),
+            createdBy = 1,
+            createdDate = 0,
+            updatedDate = null,
+            updatedBy = null
+        )
+
     val familyDetailInvite = FamilyDetailInvite(inviteeId = 2, invitedBy = 1)
 
     val familyDetailLeave = FamilyMemberLeave(2)
