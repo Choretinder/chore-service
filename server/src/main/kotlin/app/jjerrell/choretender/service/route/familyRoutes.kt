@@ -37,7 +37,7 @@ internal fun Route.familyRoutes() {
                 val createdFamily = familyRepository.createFamily(familyCreateBody)
                 call.respond(createdFamily)
             } catch (e: ContentTransformationException) {
-                call.respond(HttpStatusCode.BadRequest)
+                call.respond(HttpStatusCode.BadRequest, "Missing or invalid request body")
             } catch (e: Throwable) {
                 call.respond(HttpStatusCode.InternalServerError)
             }
@@ -49,7 +49,7 @@ internal fun Route.familyRoutes() {
                         val familyLookup = familyRepository.getFamilyDetail(it)
                         call.respond(familyLookup)
                     }
-                        ?: run { call.respond(HttpStatusCode.BadRequest) }
+                        ?: run { call.respond(HttpStatusCode.BadRequest, "Missing or invalid ID") }
                 } catch (e: Throwable) {
                     call.respond(HttpStatusCode.InternalServerError)
                 }
@@ -62,9 +62,9 @@ internal fun Route.familyRoutes() {
                             familyRepository.inviteFamilyMember(it, familyInviteBody)
                         call.respond(updatedFamily)
                     }
-                        ?: run { call.respond(HttpStatusCode.BadRequest) }
+                        ?: run { call.respond(HttpStatusCode.BadRequest, "Missing or invalid ID") }
                 } catch (e: ContentTransformationException) {
-                    call.respond(HttpStatusCode.BadRequest)
+                    call.respond(HttpStatusCode.BadRequest, "Missing or invalid request body")
                 } catch (e: Throwable) {
                     call.respond(HttpStatusCode.InternalServerError)
                 }
@@ -76,9 +76,9 @@ internal fun Route.familyRoutes() {
                         val updatedFamily = familyRepository.leaveFamilyGroup(it, familyLeaveBody)
                         call.respond(updatedFamily)
                     }
-                        ?: run { call.respond(HttpStatusCode.BadRequest) }
+                        ?: run { call.respond(HttpStatusCode.BadRequest, "Missing or invalid ID") }
                 } catch (e: ContentTransformationException) {
-                    call.respond(HttpStatusCode.BadRequest)
+                    call.respond(HttpStatusCode.BadRequest, "Missing or invalid request body")
                 } catch (e: Throwable) {
                     call.respond(HttpStatusCode.InternalServerError)
                 }
@@ -91,9 +91,9 @@ internal fun Route.familyRoutes() {
                             familyRepository.verifyFamilyMember(it, familyVerifyBody)
                         call.respond(updatedFamily)
                     }
-                        ?: run { call.respond(HttpStatusCode.BadRequest) }
+                        ?: run { call.respond(HttpStatusCode.BadRequest, "Missing or invalid ID") }
                 } catch (e: ContentTransformationException) {
-                    call.respond(HttpStatusCode.BadRequest)
+                    call.respond(HttpStatusCode.BadRequest, "Missing or invalid request body")
                 } catch (e: Throwable) {
                     call.respond(HttpStatusCode.InternalServerError)
                 }
@@ -106,9 +106,9 @@ internal fun Route.familyRoutes() {
                             familyRepository.changeMemberRole(it, familyMemberRoleBody)
                         call.respond(updatedFamily)
                     }
-                        ?: run { call.respond(HttpStatusCode.BadRequest) }
+                        ?: run { call.respond(HttpStatusCode.BadRequest, "Missing or invalid ID") }
                 } catch (e: ContentTransformationException) {
-                    call.respond(HttpStatusCode.BadRequest)
+                    call.respond(HttpStatusCode.BadRequest, "Missing or invalid request body")
                 } catch (e: Throwable) {
                     call.respond(HttpStatusCode.InternalServerError)
                 }

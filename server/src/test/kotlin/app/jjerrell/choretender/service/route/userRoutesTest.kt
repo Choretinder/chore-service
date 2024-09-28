@@ -18,11 +18,11 @@
 package app.jjerrell.choretender.service.route
 
 import app.jjerrell.choretender.service.domain.model.user.UserDetailCreate
-import app.jjerrell.choretender.service.domain.model.user.UserDetailRead
 import app.jjerrell.choretender.service.domain.model.user.UserDetailUpdate
 import app.jjerrell.choretender.service.domain.model.user.UserType
 import app.jjerrell.choretender.service.domain.repository.IChoreServiceUserRepository
 import app.jjerrell.choretender.service.setupPlugins
+import app.jjerrell.choretender.service.util.TestData
 import io.ktor.client.plugins.contentnegotiation.*
 import io.ktor.client.request.*
 import io.ktor.http.*
@@ -39,18 +39,6 @@ import org.junit.After
 import org.koin.core.context.stopKoin
 import org.koin.dsl.module
 import org.koin.ktor.plugin.Koin
-
-private val defaultUser =
-    UserDetailRead(
-        id = 1,
-        name = "Test",
-        type = UserType.MANAGER,
-        contactInfo = null,
-        createdBy = 0,
-        createdDate = 0,
-        updatedDate = null,
-        updatedBy = null
-    )
 
 class UserRoutesTest {
     @After
@@ -187,9 +175,9 @@ class UserRoutesTest {
                     module {
                         factory<IChoreServiceUserRepository> {
                             mockk {
-                                coEvery { getUserDetail(any()) } returns defaultUser
-                                coEvery { createUser(any()) } returns defaultUser
-                                coEvery { updateUser(any()) } returns defaultUser
+                                coEvery { getUserDetail(any()) } returns TestData.defaultUser
+                                coEvery { createUser(any()) } returns TestData.defaultUser
+                                coEvery { updateUser(any()) } returns TestData.defaultUser
                             }
                         }
                     }
