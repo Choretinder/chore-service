@@ -39,9 +39,7 @@ internal fun Route.choreRoutes() {
                     val familyChores = choreRepository.getFamilyChoreDetails(it)
                     call.respond(familyChores)
                 }
-                    ?: run { call.respond(HttpStatusCode.BadRequest) }
-            } catch (e: ContentTransformationException) {
-                call.respond(HttpStatusCode.BadRequest)
+                    ?: run { call.respond(HttpStatusCode.BadRequest, "Missing or invalid ID") }
             } catch (e: Throwable) {
                 call.respond(HttpStatusCode.InternalServerError)
             }
@@ -55,11 +53,13 @@ internal fun Route.choreRoutes() {
                             choreRepository.getChoreDetail(familyId = familyId, choreId = choreId)
                         )
                     }
-                        ?: run { call.respond(HttpStatusCode.BadRequest) }
+                        ?: run {
+                            call.respond(HttpStatusCode.BadRequest, "Missing or invalid Chore ID")
+                        }
                 }
-                    ?: run { call.respond(HttpStatusCode.BadRequest) }
-            } catch (e: ContentTransformationException) {
-                call.respond(HttpStatusCode.BadRequest)
+                    ?: run {
+                        call.respond(HttpStatusCode.BadRequest, "Missing or invalid Family ID")
+                    }
             } catch (e: Throwable) {
                 call.respond(HttpStatusCode.InternalServerError)
             }
@@ -71,11 +71,9 @@ internal fun Route.choreRoutes() {
                     val choreCreateBody = call.receive<ChoreDetailCreate>()
                     call.respond(choreRepository.createChore(familyId, choreCreateBody))
                 }
-                    ?: run { call.respond(HttpStatusCode.BadRequest) }
-                val familyId = requireNotNull(call.parameters[PARAM_FAMILY_ID])
-                call.respondText("Created Chore for family ID: $familyId")
+                    ?: run { call.respond(HttpStatusCode.BadRequest, "Missing or invalid ID") }
             } catch (e: ContentTransformationException) {
-                call.respond(HttpStatusCode.BadRequest)
+                call.respond(HttpStatusCode.BadRequest, "Missing or invalid request body")
             } catch (e: Throwable) {
                 call.respond(HttpStatusCode.InternalServerError)
             }
@@ -83,11 +81,13 @@ internal fun Route.choreRoutes() {
 
         post("update") {
             try {
-                val familyId = requireNotNull(call.parameters[PARAM_FAMILY_ID]?.toLongOrNull())
-                val choreUpdateBody = call.receive<ChoreDetailUpdate>()
-                call.respond(choreRepository.updateChore(familyId, choreUpdateBody))
+                call.parameters[PARAM_FAMILY_ID]?.toLongOrNull()?.let { familyId ->
+                    val choreUpdateBody = call.receive<ChoreDetailUpdate>()
+                    call.respond(choreRepository.updateChore(familyId, choreUpdateBody))
+                }
+                    ?: run { call.respond(HttpStatusCode.BadRequest, "Missing or invalid ID") }
             } catch (e: ContentTransformationException) {
-                call.respond(HttpStatusCode.BadRequest)
+                call.respond(HttpStatusCode.BadRequest, "Missing or invalid request body")
             } catch (e: Throwable) {
                 call.respond(HttpStatusCode.InternalServerError)
             }

@@ -17,6 +17,8 @@
  */
 package app.jjerrell.choretender.service.util
 
+import app.jjerrell.choretender.service.domain.model.chore.ChoreDetailCreate
+import app.jjerrell.choretender.service.domain.model.chore.ChoreDetailUpdate
 import app.jjerrell.choretender.service.domain.model.family.*
 import app.jjerrell.choretender.service.domain.model.user.UserDetailRead
 import app.jjerrell.choretender.service.domain.model.user.UserType
@@ -68,4 +70,8 @@ data object TestData {
     val familyMemberVerify = FamilyMemberVerify(memberId = 2)
 
     val familyMemberPromote = FamilyMemberChangeRole(memberId = 2, role = UserType.MANAGER)
+
+    val choreDetailCreate = ChoreDetailCreate(name = "Test", createdBy = 0)
+
+    val choreDetailUpdate = ChoreDetailUpdate(id = 1, name = "Test Update", updatedBy = 1)
 }
