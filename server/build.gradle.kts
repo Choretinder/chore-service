@@ -5,6 +5,7 @@ plugins {
     alias(libs.plugins.roomDb)
     alias(libs.plugins.kotlinSerialization)
     application
+    jacoco
 }
 
 group = "app.jjerrell.choretender.service"
@@ -52,6 +53,25 @@ dependencies {
     testImplementation("io.ktor:ktor-client-cio:2.3.12")
     testImplementation("io.ktor:ktor-client-content-negotiation:2.3.12")
     testImplementation(libs.kotlin.test.junit)
+    testImplementation("io.mockk:mockk:1.13.12")
 }
 
 room { schemaDirectory("$projectDir/schemas") }
+
+jacoco {
+    toolVersion = "0.8.8"
+}
+
+tasks.withType<Test> {
+    useJUnitPlatform()
+    finalizedBy("jacocoTestReport") // Generate report after tests run
+}
+
+tasks.jacocoTestReport {
+    dependsOn("test") // Ensure tests run before generating report
+    reports {
+        xml.required.set(true)    // Enable XML reports
+        csv.required.set(false)
+        html.required.set(true)   // Optional: Enable HTML reports
+    }
+}

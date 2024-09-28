@@ -7,6 +7,7 @@ plugins {
     alias(libs.plugins.roomDb).apply(false)
     alias(libs.plugins.kotlinSerialization).apply(false)
     alias(libs.plugins.spotless)
+    id("com.github.nbaztec.coveralls-jacoco") version "1.2.20"
 }
 
 subprojects {
