@@ -48,6 +48,9 @@ dependencies {
 
     // Testing
     testImplementation(libs.ktor.server.tests)
+    testImplementation("io.ktor:ktor-client-core:2.3.12")
+    testImplementation("io.ktor:ktor-client-cio:2.3.12")
+    testImplementation("io.ktor:ktor-client-content-negotiation:2.3.12")
     testImplementation(libs.kotlin.test.junit)
 }
 

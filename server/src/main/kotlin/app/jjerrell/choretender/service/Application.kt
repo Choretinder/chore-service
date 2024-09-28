@@ -40,7 +40,11 @@ fun main() {
 
 fun Application.module() {
     setupPlugins()
+    setupKoin()
+    setupRouting()
+}
 
+internal fun Application.setupRouting() {
     routing {
         route("v1") {
             userRoutes()
@@ -50,7 +54,7 @@ fun Application.module() {
     }
 }
 
-private fun Application.setupPlugins() {
+internal fun Application.setupPlugins() {
     install(ContentNegotiation) {
         json(
             Json {
@@ -60,10 +64,12 @@ private fun Application.setupPlugins() {
         )
     }
 
+    install(IgnoreTrailingSlash)
+}
+
+internal fun Application.setupKoin() {
     install(Koin) {
         slf4jLogger()
         modules(appModule + repositoryModule)
     }
-
-    install(IgnoreTrailingSlash)
 }
