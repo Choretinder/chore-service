@@ -50,7 +50,7 @@ internal fun Route.userRoutes() {
         post {
             try {
                 val userCreateBody = call.receive<UserDetailCreate>()
-                val createdUser = async { userRepository.createUser(userCreateBody) }.await()
+                val createdUser = userRepository.createUser(userCreateBody)
                 if (createdUser == null) {
                     call.respond(HttpStatusCode.NotFound)
                 } else {

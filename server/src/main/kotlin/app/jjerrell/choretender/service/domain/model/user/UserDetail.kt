@@ -17,6 +17,7 @@
  */
 package app.jjerrell.choretender.service.domain.model.user
 
+import kotlinx.datetime.Clock
 import kotlinx.serialization.Serializable
 
 enum class UserType {
@@ -30,7 +31,7 @@ data class UserDetailCreate(
     val type: UserType,
     val contactInfo: ContactInfo?,
     val createdBy: Long,
-    val createdDate: Long
+    val createdDate: Long = Clock.System.now().epochSeconds
 )
 
 @Serializable
@@ -51,6 +52,6 @@ data class UserDetailUpdate(
     val name: String,
     val type: UserType,
     val contactInfo: ContactInfo?,
-    val updatedDate: Long?,
+    val updatedDate: Long = Clock.System.now().epochSeconds,
     val updatedBy: Long
 )
