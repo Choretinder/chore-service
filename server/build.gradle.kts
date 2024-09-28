@@ -58,10 +58,7 @@ dependencies {
 
 room { schemaDirectory("$projectDir/schemas") }
 
-jacoco { toolVersion = "0.8.8" }
-
 tasks.withType<Test> {
-    useJUnitPlatform()
     finalizedBy("jacocoTestReport") // Generate report after tests run
 }
 

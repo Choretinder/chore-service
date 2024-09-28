@@ -35,4 +35,3 @@ jobs:
         uses: coverallsapp/github-action@v2.2.0
         with:
           github-token: ${{ secrets.GITHUB_TOKEN }}
-          path-to-jacoco: server/build/reports/jacoco/test/jacocoTestReport.xml
