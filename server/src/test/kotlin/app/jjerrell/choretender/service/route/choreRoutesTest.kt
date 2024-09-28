@@ -17,20 +17,28 @@
  */
 package app.jjerrell.choretender.service.route
 
+import app.jjerrell.choretender.service.domain.model.chore.ChoreDetailRead
+import app.jjerrell.choretender.service.domain.repository.IChoreServiceChoreRepository
 import app.jjerrell.choretender.service.setupPlugins
 import app.jjerrell.choretender.service.util.TestData
+import io.ktor.client.call.*
 import io.ktor.client.plugins.contentnegotiation.*
 import io.ktor.client.request.*
 import io.ktor.client.statement.*
 import io.ktor.http.*
 import io.ktor.serialization.kotlinx.json.*
+import io.ktor.server.application.*
 import io.ktor.server.routing.*
 import io.ktor.server.testing.*
+import io.mockk.coEvery
+import io.mockk.mockk
 import io.mockk.unmockkAll
 import kotlin.test.Test
 import kotlin.test.assertEquals
 import org.junit.After
 import org.koin.core.context.stopKoin
+import org.koin.dsl.module
+import org.koin.ktor.plugin.Koin
 
 class ChoreRoutesTest {
     @After
@@ -110,5 +118,121 @@ class ChoreRoutesTest {
                 setBody(TestData.choreDetailUpdate)
             }
         assertEquals(HttpStatusCode.InternalServerError, updateChoreResponse.status)
+    }
+
+    @Test
+    fun `testChoreRoutes getAllChores`() = testApplication {
+        val client = createClient { install(ContentNegotiation) { json() } }
+        application {
+            setupPlugins()
+            install(Koin) {
+                modules(
+                    module {
+                        factory<IChoreServiceChoreRepository> {
+                            mockk {
+                                coEvery { getFamilyChoreDetails(familyId = 1) } returns
+                                    listOf(TestData.choreDetailReadOne, TestData.choreDetailReadTwo)
+                            }
+                        }
+                    }
+                )
+            }
+            routing { route("test") { choreRoutes() } }
+        }
+
+        val getChoresResponse = client.get("test/family/1/chore")
+        assertEquals(HttpStatusCode.OK, getChoresResponse.status)
+        assertEquals(
+            listOf(TestData.choreDetailReadOne, TestData.choreDetailReadTwo),
+            getChoresResponse.body<List<ChoreDetailRead>>()
+        )
+    }
+
+    @Test
+    fun `testChoreRoutes getChore`() = testApplication {
+        val client = createClient { install(ContentNegotiation) { json() } }
+        application {
+            setupPlugins()
+            install(Koin) {
+                modules(
+                    module {
+                        factory<IChoreServiceChoreRepository> {
+                            mockk {
+                                coEvery { getChoreDetail(familyId = 1, choreId = 1) } returns
+                                    TestData.choreDetailReadOne
+                            }
+                        }
+                    }
+                )
+            }
+            routing { route("test") { choreRoutes() } }
+        }
+
+        val getChoreResponse = client.get("test/family/1/chore/1")
+        assertEquals(HttpStatusCode.OK, getChoreResponse.status)
+        assertEquals(TestData.choreDetailReadOne, getChoreResponse.body<ChoreDetailRead>())
+    }
+
+    @Test
+    fun `testChoreRoutes createChore`() = testApplication {
+        val client = createClient { install(ContentNegotiation) { json() } }
+        application {
+            setupPlugins()
+            install(Koin) {
+                modules(
+                    module {
+                        factory<IChoreServiceChoreRepository> {
+                            mockk {
+                                coEvery {
+                                    createChore(familyId = 1, detail = TestData.choreDetailCreate)
+                                } returns TestData.choreDetailReadOne
+                            }
+                        }
+                    }
+                )
+            }
+            routing { route("test") { choreRoutes() } }
+        }
+
+        val createChoreResponse =
+            client.post("test/family/1/chore") {
+                contentType(ContentType.Application.Json)
+                setBody(TestData.choreDetailCreate)
+            }
+        assertEquals(HttpStatusCode.OK, createChoreResponse.status)
+        assertEquals(TestData.choreDetailReadOne, createChoreResponse.body<ChoreDetailRead>())
+    }
+
+    @Test
+    fun `testChoreRoutes updateChore`() = testApplication {
+        val client = createClient { install(ContentNegotiation) { json() } }
+        application {
+            setupPlugins()
+            install(Koin) {
+                modules(
+                    module {
+                        factory<IChoreServiceChoreRepository> {
+                            mockk {
+                                coEvery {
+                                    updateChore(familyId = 1, detail = TestData.choreDetailUpdate)
+                                } returns TestData.choreDetailReadOneUpdated
+                            }
+                        }
+                    }
+                )
+            }
+            routing { route("test") { choreRoutes() } }
+        }
+
+        val updateChoreResponse =
+            client.post("test/family/1/chore/update") {
+                contentType(ContentType.Application.Json)
+                setBody(TestData.choreDetailUpdate)
+            }
+        assertEquals(HttpStatusCode.OK, updateChoreResponse.status)
+        assertEquals(
+            TestData.choreDetailReadOneUpdated,
+            updateChoreResponse.body<ChoreDetailRead>()
+        )
     }
 }

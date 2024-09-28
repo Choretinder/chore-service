@@ -17,8 +17,7 @@
  */
 package app.jjerrell.choretender.service.util
 
-import app.jjerrell.choretender.service.domain.model.chore.ChoreDetailCreate
-import app.jjerrell.choretender.service.domain.model.chore.ChoreDetailUpdate
+import app.jjerrell.choretender.service.domain.model.chore.*
 import app.jjerrell.choretender.service.domain.model.family.*
 import app.jjerrell.choretender.service.domain.model.user.UserDetailRead
 import app.jjerrell.choretender.service.domain.model.user.UserType
@@ -71,7 +70,47 @@ data object TestData {
 
     val familyMemberPromote = FamilyMemberChangeRole(memberId = 2, role = UserType.MANAGER)
 
-    val choreDetailCreate = ChoreDetailCreate(name = "Test", createdBy = 0)
+    val choreDetailCreate = ChoreDetailCreate(name = "Test", createdBy = 1, createdDate = 0)
 
-    val choreDetailUpdate = ChoreDetailUpdate(id = 1, name = "Test Update", updatedBy = 1)
+    val choreDetailUpdate =
+        ChoreDetailUpdate(id = 1, name = "Test Update", updatedBy = 1, updatedDate = 0)
+
+    val choreDetailReadOne =
+        ChoreDetailRead(
+            id = 1,
+            name = "Test",
+            recurrence = ChoreRecurrence.NONE,
+            createdBy = 1,
+            createdDate = 0,
+            endDate = null,
+            status = ChoreCompletion.NONE,
+            updatedBy = null,
+            updatedDate = null
+        )
+
+    val choreDetailReadOneUpdated =
+        ChoreDetailRead(
+            id = 1,
+            name = "Test Update",
+            recurrence = ChoreRecurrence.NONE,
+            createdBy = 1,
+            createdDate = 0,
+            endDate = null,
+            status = ChoreCompletion.NONE,
+            updatedBy = 1,
+            updatedDate = 1
+        )
+
+    val choreDetailReadTwo =
+        ChoreDetailRead(
+            id = 2,
+            name = "Test",
+            recurrence = ChoreRecurrence.DAILY,
+            createdBy = 1,
+            createdDate = 2,
+            endDate = null,
+            status = ChoreCompletion.NONE,
+            updatedBy = null,
+            updatedDate = null
+        )
 }
