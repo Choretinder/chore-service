@@ -17,9 +17,6 @@
  */
 package app.jjerrell.choretender.service.domain.repository
 
-import androidx.room.Room
-import androidx.sqlite.driver.bundled.BundledSQLiteDriver
-import app.jjerrell.choretender.service.database.ChoreServiceDatabase
 import app.jjerrell.choretender.service.domain.model.family.FamilyMemberChangeRole
 import app.jjerrell.choretender.service.domain.model.family.FamilyMemberLeave
 import app.jjerrell.choretender.service.domain.model.family.FamilyMemberVerify
@@ -29,37 +26,16 @@ import io.ktor.server.plugins.*
 import io.ktor.util.logging.*
 import kotlin.test.*
 import kotlinx.coroutines.test.runTest
-import org.junit.After
-import org.junit.Before
 
-class FamilyRepositoryTest {
-    private lateinit var db: ChoreServiceDatabase
-    private val logger: Logger = KtorSimpleLogger("TestLogger")
-
-    @Before
-    fun createDb() {
-        db =
-            Room.inMemoryDatabaseBuilder<ChoreServiceDatabase>()
-                .setDriver(BundledSQLiteDriver())
-                .build()
-    }
-
-    @After
-    fun closeDb() {
-        db.close()
-    }
-
+class FamilyRepositoryTest : FamilyTests() {
     @Test
     fun testCreateFamily() = runTest {
         // Arrange
         // == Create a standard user
-        val userRepo = UserRepository(db, logger)
-        val createdUser =
-            userRepo.createUser(TestData.userDetailCreate.copy(type = UserType.STANDARD))
+        val createdUser = createUser()
 
         // == Create the family
-        val familyRepo = FamilyRepository(db, logger)
-        val createdFamily = familyRepo.createFamily(TestData.familyDetailCreate)
+        val createdFamily = createFamily()
 
         // Test
         assertEquals(TestData.familyDetailRead.id, createdFamily.id)
@@ -84,18 +60,13 @@ class FamilyRepositoryTest {
     @Test
     fun testCreateFamilyWithInvitee() = runTest {
         // Arrange
-        // == Create a standard user
+        // == Create standard users
         val userRepo = UserRepository(db, logger)
-        val createdUser =
-            userRepo.createUser(TestData.userDetailCreate.copy(type = UserType.STANDARD))
-        val secondUser = userRepo.createUser(TestData.userDetailCreate.copy(name = "Test User 2"))
+        val createdUser = createUser(userRepo)
+        val secondUser = createUser(userRepo, name = "Test User 2")
 
         // == Create the family
-        val familyRepo = FamilyRepository(db, logger)
-        val createdFamily =
-            familyRepo.createFamily(
-                TestData.familyDetailCreate.copy(invitees = listOf(secondUser.id))
-            )
+        val createdFamily = createFamily(invitees = listOf(secondUser.id))
 
         // Test
         val creator = createdFamily.members.first()
@@ -113,18 +84,13 @@ class FamilyRepositoryTest {
     @Test
     fun testCreateFamilyWithDuplicateInvitee() = runTest {
         // Arrange
-        // == Create a standard user
+        // == Create standard users
         val userRepo = UserRepository(db, logger)
-        val createdUser =
-            userRepo.createUser(TestData.userDetailCreate.copy(type = UserType.STANDARD))
-        val secondUser = userRepo.createUser(TestData.userDetailCreate.copy(name = "Test User 2"))
+        val createdUser = createUser(userRepo)
+        val secondUser = createUser(userRepo, name = "Test User 2")
 
         // == Create the family
-        val familyRepo = FamilyRepository(db, logger)
-        val createdFamily =
-            familyRepo.createFamily(
-                TestData.familyDetailCreate.copy(invitees = listOf(secondUser.id, secondUser.id))
-            )
+        val createdFamily = createFamily(invitees = listOf(secondUser.id, secondUser.id))
 
         // Test
         assert(createdFamily.invitees?.count() == 1)

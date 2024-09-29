@@ -28,6 +28,7 @@ import io.ktor.client.request.*
 import io.ktor.http.*
 import io.ktor.serialization.kotlinx.json.*
 import io.ktor.server.application.*
+import io.ktor.server.plugins.*
 import io.ktor.server.routing.*
 import io.ktor.server.testing.*
 import io.mockk.coEvery
@@ -117,9 +118,9 @@ class UserRoutesTest {
                     module {
                         factory<IChoreServiceUserRepository> {
                             mockk {
-                                coEvery { getUserDetail(any()) } returns null
-                                coEvery { createUser(any()) } returns null
-                                coEvery { updateUser(any()) } returns null
+                                coEvery { getUserDetail(any()) } throws NotFoundException()
+                                coEvery { createUser(any()) } throws NotFoundException()
+                                coEvery { updateUser(any()) } throws NotFoundException()
                             }
                         }
                     }

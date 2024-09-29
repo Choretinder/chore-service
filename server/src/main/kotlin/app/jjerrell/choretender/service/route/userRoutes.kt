@@ -22,7 +22,9 @@ import app.jjerrell.choretender.service.domain.model.user.UserDetailUpdate
 import app.jjerrell.choretender.service.domain.repository.IChoreServiceUserRepository
 import io.ktor.http.*
 import io.ktor.server.application.*
+import io.ktor.server.plugins.*
 import io.ktor.server.request.*
+import io.ktor.server.request.ContentTransformationException
 import io.ktor.server.response.*
 import io.ktor.server.routing.*
 import org.koin.ktor.ext.inject
@@ -35,13 +37,11 @@ internal fun Route.userRoutes() {
             try {
                 call.parameters["id"]?.toLongOrNull()?.let {
                     val userLookup = userRepository.getUserDetail(it)
-                    if (userLookup == null) {
-                        call.respond(HttpStatusCode.NotFound)
-                    } else {
-                        call.respond(userLookup)
-                    }
+                    call.respond(userLookup)
                 }
                     ?: run { call.respond(HttpStatusCode.BadRequest) }
+            } catch (e: NotFoundException) {
+                call.respond(HttpStatusCode.NotFound)
             } catch (e: Throwable) {
                 call.respond(HttpStatusCode.InternalServerError)
             }
@@ -50,11 +50,9 @@ internal fun Route.userRoutes() {
             try {
                 val userCreateBody = call.receive<UserDetailCreate>()
                 val createdUser = userRepository.createUser(userCreateBody)
-                if (createdUser == null) {
-                    call.respond(HttpStatusCode.NotFound)
-                } else {
-                    call.respond(createdUser)
-                }
+                call.respond(createdUser)
+            } catch (e: NotFoundException) {
+                call.respond(HttpStatusCode.NotFound)
             } catch (e: ContentTransformationException) {
                 call.respond(HttpStatusCode.BadRequest)
             } catch (e: Throwable) {
@@ -65,11 +63,9 @@ internal fun Route.userRoutes() {
             try {
                 val userUpdateBody = call.receive<UserDetailUpdate>()
                 val updatedUser = userRepository.updateUser(userUpdateBody)
-                if (updatedUser == null) {
-                    call.respond(HttpStatusCode.NotFound)
-                } else {
-                    call.respond(updatedUser)
-                }
+                call.respond(updatedUser)
+            } catch (e: NotFoundException) {
+                call.respond(HttpStatusCode.NotFound)
             } catch (e: ContentTransformationException) {
                 call.respond(HttpStatusCode.BadRequest)
             } catch (e: Throwable) {
