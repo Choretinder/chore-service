@@ -27,7 +27,6 @@ import app.jjerrell.choretender.service.domain.model.user.UserDetailRead
 import app.jjerrell.choretender.service.domain.model.user.UserDetailUpdate
 import app.jjerrell.choretender.service.domain.model.user.UserType
 import io.ktor.util.logging.*
-import kotlinx.datetime.Clock
 
 internal class UserRepository(private val db: ChoreServiceDatabase, private val logger: Logger) :
     IChoreServiceUserRepository {
@@ -41,22 +40,15 @@ internal class UserRepository(private val db: ChoreServiceDatabase, private val 
     }
 
     override suspend fun updateUser(detail: UserDetailUpdate): UserDetailRead {
+        val targetUser = db.userDao().getUserById(detail.id)
         val targetUserUpdate =
-            db.userDao()
-                .getUserById(detail.id)
-                .copy(
-                    name = detail.name,
-                    userType = detail.type.name,
-                    updatedDateSeconds = detail.updatedDate ?: Clock.System.now().epochSeconds,
-                    updatedBy = detail.updatedBy
-                )
-                .let {
-                    if (detail.contactInfo != null) {
-                        it.copy(contact = detail.contactInfo.toContactEntity())
-                    } else {
-                        it
-                    }
-                }
+            targetUser.copy(
+                name = detail.name ?: targetUser.name,
+                userType = detail.type?.name ?: targetUser.userType,
+                contact = detail.contactInfo?.toContactEntity() ?: targetUser.contact,
+                updatedDateSeconds = detail.updatedDate,
+                updatedBy = detail.updatedBy
+            )
         // operation
         db.userDao().updateUser(user = targetUserUpdate)
         // return value

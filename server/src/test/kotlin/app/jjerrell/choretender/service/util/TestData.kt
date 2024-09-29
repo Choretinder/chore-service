@@ -19,8 +19,7 @@ package app.jjerrell.choretender.service.util
 
 import app.jjerrell.choretender.service.domain.model.chore.*
 import app.jjerrell.choretender.service.domain.model.family.*
-import app.jjerrell.choretender.service.domain.model.user.UserDetailRead
-import app.jjerrell.choretender.service.domain.model.user.UserType
+import app.jjerrell.choretender.service.domain.model.user.*
 
 data object TestData {
     val defaultUser =
@@ -33,6 +32,39 @@ data object TestData {
             createdDate = 0,
             updatedDate = null,
             updatedBy = null
+        )
+
+    val userDetailCreate =
+        UserDetailCreate(
+            name = "Test",
+            type = UserType.MANAGER,
+            contactInfo = null,
+            createdBy = 0,
+            createdDate = 0
+        )
+
+    val userDetailUpdate =
+        UserDetailUpdate(
+            id = 1,
+            name = "Test updated",
+            contactInfo =
+                ContactInfo(
+                    resource = "test@test.dev",
+                    type = ContactType.EMAIL,
+                    isVerified = true
+                ),
+            updatedBy = 1,
+            updatedDate = 1
+        )
+
+    val userDetailUpdateAlternate =
+        UserDetailUpdate(
+            id = 1,
+            name = null,
+            type = UserType.STANDARD,
+            contactInfo = null,
+            updatedBy = 1,
+            updatedDate = 1
         )
 
     val familyDetailCreate =

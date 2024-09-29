@@ -49,9 +49,9 @@ data class UserDetailRead(
 @Serializable
 data class UserDetailUpdate(
     val id: Long,
-    val name: String,
-    val type: UserType,
-    val contactInfo: ContactInfo?,
+    val name: String? = null,
+    val type: UserType? = null,
+    val contactInfo: ContactInfo? = null,
     val updatedDate: Long = Clock.System.now().epochSeconds,
     val updatedBy: Long
 )

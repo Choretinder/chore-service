@@ -52,6 +52,7 @@ dependencies {
     testImplementation("io.ktor:ktor-client-core:2.3.12")
     testImplementation("io.ktor:ktor-client-cio:2.3.12")
     testImplementation("io.ktor:ktor-client-content-negotiation:2.3.12")
+    testImplementation("org.jetbrains.kotlinx:kotlinx-coroutines-test:1.9.0")
     testImplementation(libs.kotlin.test.junit)
     testImplementation("io.mockk:mockk:1.13.12")
 }
