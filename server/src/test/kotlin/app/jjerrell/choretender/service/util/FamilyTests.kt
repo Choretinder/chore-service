@@ -20,12 +20,12 @@ package app.jjerrell.choretender.service.util
 import androidx.room.Room
 import androidx.sqlite.driver.bundled.BundledSQLiteDriver
 import app.jjerrell.choretender.service.database.ChoreServiceDatabase
+import app.jjerrell.choretender.service.domain.model.chore.ChoreDetailRead
 import app.jjerrell.choretender.service.domain.model.family.FamilyDetailRead
 import app.jjerrell.choretender.service.domain.model.user.UserDetailRead
 import app.jjerrell.choretender.service.domain.model.user.UserType
+import app.jjerrell.choretender.service.domain.repository.*
 import app.jjerrell.choretender.service.domain.repository.FamilyRepository
-import app.jjerrell.choretender.service.domain.repository.IChoreServiceFamilyRepository
-import app.jjerrell.choretender.service.domain.repository.IChoreServiceUserRepository
 import app.jjerrell.choretender.service.domain.repository.UserRepository
 import io.ktor.util.logging.*
 import org.junit.After
@@ -61,5 +61,15 @@ abstract class FamilyTests {
         invitees: List<Long>? = null
     ): FamilyDetailRead {
         return repo.createFamily(TestData.familyDetailCreate.copy(invitees = invitees))
+    }
+
+    suspend fun createChore(
+        repo: IChoreServiceChoreRepository = ChoreRepository(db, logger),
+        name: String = "Test"
+    ): ChoreDetailRead {
+        return repo.createChore(
+            familyId = TestData.familyDetailRead.id,
+            detail = TestData.choreDetailCreate.copy(name = name)
+        )
     }
 }

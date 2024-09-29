@@ -35,23 +35,30 @@ internal class ChoreRepository(private val db: ChoreServiceDatabase, private val
 
     override suspend fun createChore(familyId: Long, detail: ChoreDetailCreate): ChoreDetailRead {
         val createdChoreId = db.familyDao().insertChore(detail.convertToEntity(familyId))
-        return db.familyDao()
-            .getChore(familyId = familyId, choreId = createdChoreId)
-            .convertToDetail()
+        return getChoreDetail(familyId = familyId, choreId = createdChoreId)
     }
 
     override suspend fun updateChore(familyId: Long, detail: ChoreDetailUpdate): ChoreDetailRead {
         // Mutate the Chore in memory
-        val existingChoreEntityUpdated =
-            db.familyDao().getChore(familyId = familyId, choreId = detail.id).updateWith(detail)
+        val existingChoreUpdated =
+            getChoreDetail(familyId = familyId, choreId = detail.id)
+                .let {
+                    it.copy(
+                        name = detail.name ?: it.name,
+                        recurrence = detail.recurrence ?: it.recurrence,
+                        endDate = detail.endDate ?: it.endDate,
+                        status = detail.status ?: it.status,
+                        updatedDate = detail.updatedDate,
+                        updatedBy = detail.updatedBy
+                    )
+                }
+                .convertToEntity(familyId)
 
         // Update the Chore in the database
-        db.familyDao().updateChore(existingChoreEntityUpdated)
+        db.familyDao().updateChore(existingChoreUpdated)
 
         // Return the updated Chore
-        return db.familyDao()
-            .getChore(familyId = familyId, choreId = existingChoreEntityUpdated.choreId)
-            .convertToDetail()
+        return getChoreDetail(familyId = familyId, choreId = existingChoreUpdated.choreId)
     }
 }
 
@@ -68,6 +75,20 @@ private fun ChoreEntity.convertToDetail() =
         updatedDate = updatedDate
     )
 
+private fun ChoreDetailRead.convertToEntity(familyId: Long) =
+    ChoreEntity(
+        choreId = id,
+        familyId = familyId,
+        name = name,
+        recurrence = recurrence.name,
+        createdDate = createdDate,
+        createdBy = createdBy,
+        endDate = endDate,
+        status = status.name,
+        updatedBy = updatedBy,
+        updatedDate = updatedDate
+    )
+
 private fun ChoreDetailCreate.convertToEntity(familyId: Long) =
     ChoreEntity(
         familyId = familyId,
@@ -79,14 +100,4 @@ private fun ChoreDetailCreate.convertToEntity(familyId: Long) =
         createdDate = createdDate,
         updatedBy = null,
         updatedDate = null
-    )
-
-private fun ChoreEntity.updateWith(update: ChoreDetailUpdate) =
-    copy(
-        name = update.name ?: name,
-        recurrence = update.recurrence?.name ?: recurrence,
-        endDate = update.endDate ?: endDate,
-        status = update.status?.name ?: status,
-        updatedDate = update.updatedDate,
-        updatedBy = update.updatedBy
     )

@@ -17,27 +17,97 @@
  */
 package app.jjerrell.choretender.service.domain.repository
 
-import androidx.room.Room
-import androidx.sqlite.driver.bundled.BundledSQLiteDriver
-import app.jjerrell.choretender.service.database.ChoreServiceDatabase
+import app.jjerrell.choretender.service.domain.model.chore.ChoreDetailUpdate
+import app.jjerrell.choretender.service.util.FamilyTests
+import app.jjerrell.choretender.service.util.TestData
 import io.ktor.util.logging.*
-import org.junit.After
-import org.junit.Before
+import kotlin.test.Test
+import kotlin.test.assertContentEquals
+import kotlin.test.assertEquals
+import kotlinx.coroutines.test.runTest
 
-class ChoreRepositoryTest {
-    private lateinit var db: ChoreServiceDatabase
-    private val logger: Logger = KtorSimpleLogger("TestLogger")
+class ChoreRepositoryTest : FamilyTests() {
+    @Test
+    fun testCreateChore() = runTest {
+        // Arrange
+        // == Setup a standard user and family
+        createUser()
+        createFamily()
 
-    @Before
-    fun createDb() {
-        db =
-            Room.inMemoryDatabaseBuilder<ChoreServiceDatabase>()
-                .setDriver(BundledSQLiteDriver())
-                .build()
+        // Act
+        // == Create a standard chore
+        val createdChore = createChore()
+
+        // Assert
+        assertEquals(TestData.choreDetailReadOne, createdChore)
     }
 
-    @After
-    fun closeDb() {
-        db.close()
+    @Test
+    fun testReadMultipleChores() = runTest {
+        // Arrange
+        // == Setup a standard user and family with chores
+        createUser()
+        createFamily()
+        val choreRepo = ChoreRepository(db, logger)
+        val createdChore = createChore(choreRepo)
+        val secondCreatedChore = createChore(choreRepo, name = "Test Two")
+
+        val allFamilyChores = choreRepo.getFamilyChoreDetails(familyId = 1)
+
+        // Assert
+        assertContentEquals(
+            expected = listOf(createdChore, secondCreatedChore),
+            actual = allFamilyChores
+        )
+    }
+
+    @Test
+    fun testUpdateChore() = runTest {
+        // Arrange
+        // == Setup a standard user and family with a chore
+        createUser()
+        val createdFamily = createFamily()
+
+        val choreRepo = ChoreRepository(db, logger)
+        createChore(choreRepo)
+
+        // Act
+        // == Update the created chore
+        val updatedChore =
+            choreRepo.updateChore(familyId = createdFamily.id, detail = TestData.choreDetailUpdate)
+
+        // Assert
+        assertEquals(TestData.choreDetailReadOneUpdated, updatedChore)
+    }
+
+    @Test
+    fun testUpdateChoreWithAlternateChanges() = runTest {
+        // Arrange
+        // == Setup a standard user and family with a chore
+        createUser()
+        val createdFamily = createFamily()
+
+        val choreRepo = ChoreRepository(db, logger)
+        val createdChore = createChore(choreRepo)
+
+        // Act
+        // == Update the created chore
+        val updatedChore =
+            choreRepo.updateChore(
+                familyId = createdFamily.id,
+                detail =
+                    ChoreDetailUpdate(
+                        id = createdChore.id,
+                        name = createdChore.name,
+                        recurrence = createdChore.recurrence,
+                        endDate = createdChore.endDate,
+                        status = createdChore.status,
+                        updatedDate = 1,
+                        updatedBy = 1
+                    )
+            )
+
+        // Assert
+        assertEquals(TestData.choreDetailReadOne.copy(updatedBy = 1, updatedDate = 1), updatedChore)
     }
 }

@@ -105,7 +105,7 @@ data object TestData {
     val choreDetailCreate = ChoreDetailCreate(name = "Test", createdBy = 1, createdDate = 0)
 
     val choreDetailUpdate =
-        ChoreDetailUpdate(id = 1, name = "Test Update", updatedBy = 1, updatedDate = 0)
+        ChoreDetailUpdate(id = 1, name = "Test Update", updatedBy = 1, updatedDate = 1)
 
     val choreDetailReadOne =
         ChoreDetailRead(
