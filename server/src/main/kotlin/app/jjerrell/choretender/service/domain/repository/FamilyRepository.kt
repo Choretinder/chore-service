@@ -69,7 +69,7 @@ internal class FamilyRepository(private val db: ChoreServiceDatabase, private va
         }
 
         // Get the family detail
-        return db.familyDao().getFamilyWithMembers(familyId).toFamilyDetail()
+        return getFamilyDetail(familyId)
     }
 
     override suspend fun inviteFamilyMember(
@@ -96,7 +96,7 @@ internal class FamilyRepository(private val db: ChoreServiceDatabase, private va
                 )
         }
         // Get the family detail
-        return db.familyDao().getFamilyWithMembers(familyId).toFamilyDetail()
+        return getFamilyDetail(familyId)
     }
 
     override suspend fun verifyFamilyMember(
@@ -113,7 +113,7 @@ internal class FamilyRepository(private val db: ChoreServiceDatabase, private va
             throw NotFoundException("Member not found")
         } else {
             db.familyDao().updateFamilyMember(invitee)
-            db.familyDao().getFamilyWithMembers(familyId).toFamilyDetail()
+            getFamilyDetail(familyId)
         }
     }
 
@@ -131,7 +131,7 @@ internal class FamilyRepository(private val db: ChoreServiceDatabase, private va
             throw NotFoundException("Verified member not found")
         } else {
             if (db.familyDao().updateFamilyMember(targetMember) > 0) {
-                db.familyDao().getFamilyWithMembers(familyId).toFamilyDetail()
+                getFamilyDetail(familyId)
             } else {
                 throw UnsupportedOperationException(
                     "Failed to update the role for ${targetMember.memberId}"
@@ -162,7 +162,7 @@ internal class FamilyRepository(private val db: ChoreServiceDatabase, private va
 
     private suspend fun removeMember(entity: FamilyMemberEntity): FamilyDetailRead {
         db.familyDao().removeFamilyMember(entity)
-        return db.familyDao().getFamilyWithMembers(entity.familyId).toFamilyDetail()
+        return getFamilyDetail(entity.familyId)
     }
 }
 
