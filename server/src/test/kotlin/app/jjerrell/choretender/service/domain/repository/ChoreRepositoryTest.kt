@@ -20,10 +20,6 @@ package app.jjerrell.choretender.service.domain.repository
 import androidx.room.Room
 import androidx.sqlite.driver.bundled.BundledSQLiteDriver
 import app.jjerrell.choretender.service.database.ChoreServiceDatabase
-import app.jjerrell.choretender.service.domain.model.family.FamilyDetailRead
-import app.jjerrell.choretender.service.domain.model.user.UserDetailRead
-import app.jjerrell.choretender.service.domain.model.user.UserType
-import app.jjerrell.choretender.service.util.TestData
 import io.ktor.util.logging.*
 import org.junit.After
 import org.junit.Before
@@ -43,38 +39,5 @@ class ChoreRepositoryTest {
     @After
     fun closeDb() {
         db.close()
-    }
-}
-
-abstract class FamilyTests {
-    protected lateinit var db: ChoreServiceDatabase
-    protected val logger: Logger = KtorSimpleLogger("TestLogger")
-
-    @Before
-    open fun createDb() {
-        db =
-            Room.inMemoryDatabaseBuilder<ChoreServiceDatabase>()
-                .setDriver(BundledSQLiteDriver())
-                .build()
-    }
-
-    @After
-    open fun closeDb() {
-        db.close()
-    }
-
-    suspend fun createUser(
-        repo: IChoreServiceUserRepository = UserRepository(db, logger),
-        name: String = "Test",
-        type: UserType = UserType.STANDARD
-    ): UserDetailRead {
-        return repo.createUser(TestData.userDetailCreate.copy(name = name, type = type))
-    }
-
-    suspend fun createFamily(
-        repo: IChoreServiceFamilyRepository = FamilyRepository(db, logger),
-        invitees: List<Long>? = null
-    ): FamilyDetailRead {
-        return repo.createFamily(TestData.familyDetailCreate.copy(invitees = invitees))
     }
 }

@@ -21,6 +21,7 @@ import app.jjerrell.choretender.service.domain.model.family.FamilyMemberChangeRo
 import app.jjerrell.choretender.service.domain.model.family.FamilyMemberLeave
 import app.jjerrell.choretender.service.domain.model.family.FamilyMemberVerify
 import app.jjerrell.choretender.service.domain.model.user.UserType
+import app.jjerrell.choretender.service.util.FamilyTests
 import app.jjerrell.choretender.service.util.TestData
 import io.ktor.server.plugins.*
 import io.ktor.util.logging.*
@@ -99,18 +100,14 @@ class FamilyRepositoryTest : FamilyTests() {
     @Test
     fun testVerifyFamilyMember() = runTest {
         // Arrange
-        // == Create a standard user
+        // == Create standard users
         val userRepo = UserRepository(db, logger)
-        val createdUser =
-            userRepo.createUser(TestData.userDetailCreate.copy(type = UserType.STANDARD))
-        val secondUser = userRepo.createUser(TestData.userDetailCreate.copy(name = "Test User 2"))
+        val createdUser = createUser(userRepo)
+        val secondUser = createUser(userRepo, name = "Test User 2")
 
         // == Create the family
         val familyRepo = FamilyRepository(db, logger)
-        val createdFamily =
-            familyRepo.createFamily(
-                TestData.familyDetailCreate.copy(invitees = listOf(secondUser.id))
-            )
+        val createdFamily = createFamily(familyRepo, invitees = listOf(secondUser.id))
 
         val inviteeMemberId = createdFamily.invitees?.firstOrNull()?.memberId
         assertNotNull(inviteeMemberId)
@@ -132,13 +129,11 @@ class FamilyRepositoryTest : FamilyTests() {
     fun testVerifyMissingFamilyMember() = runTest {
         // Arrange
         // == Create a standard user
-        val userRepo = UserRepository(db, logger)
-        val createdUser =
-            userRepo.createUser(TestData.userDetailCreate.copy(type = UserType.STANDARD))
+        createUser()
 
-        // == Create the family
+        // == Setup the family
         val familyRepo = FamilyRepository(db, logger)
-        val createdFamily = familyRepo.createFamily(TestData.familyDetailCreate)
+        val createdFamily = createFamily(familyRepo)
 
         // Test
         assertFailsWith(NotFoundException::class) {
@@ -153,13 +148,11 @@ class FamilyRepositoryTest : FamilyTests() {
     fun testVerifyExisingFamilyMember() = runTest {
         // Arrange
         // == Create a standard user
-        val userRepo = UserRepository(db, logger)
-        val createdUser =
-            userRepo.createUser(TestData.userDetailCreate.copy(type = UserType.STANDARD))
+        createUser()
 
         // == Create the family
         val familyRepo = FamilyRepository(db, logger)
-        val createdFamily = familyRepo.createFamily(TestData.familyDetailCreate)
+        val createdFamily = createFamily(familyRepo)
 
         // Test
         assertFailsWith(NotFoundException::class) {
@@ -173,18 +166,14 @@ class FamilyRepositoryTest : FamilyTests() {
     @Test
     fun testPromoteFamilyMember() = runTest {
         // Arrange
-        // == Create a standard user
+        // == Create standard users
         val userRepo = UserRepository(db, logger)
-        val createdUser =
-            userRepo.createUser(TestData.userDetailCreate.copy(type = UserType.STANDARD))
-        val secondUser = userRepo.createUser(TestData.userDetailCreate.copy(name = "Test User 2"))
+        val createdUser = createUser(userRepo)
+        val secondUser = createUser(userRepo, name = "Test User 2")
 
         // == Create the family
         val familyRepo = FamilyRepository(db, logger)
-        val createdFamily =
-            familyRepo.createFamily(
-                TestData.familyDetailCreate.copy(invitees = listOf(secondUser.id))
-            )
+        val createdFamily = createFamily(familyRepo, invitees = listOf(secondUser.id))
 
         val inviteeMemberId = createdFamily.invitees?.firstOrNull()?.memberId
         assertNotNull(inviteeMemberId)
@@ -209,18 +198,14 @@ class FamilyRepositoryTest : FamilyTests() {
     @Test
     fun testChangeFamilyMemberRole() = runTest {
         // Arrange
-        // == Create a standard user
+        // == Create standard users
         val userRepo = UserRepository(db, logger)
-        val createdUser =
-            userRepo.createUser(TestData.userDetailCreate.copy(type = UserType.STANDARD))
-        val secondUser = userRepo.createUser(TestData.userDetailCreate.copy(name = "Test User 2"))
+        val createdUser = createUser(userRepo)
+        val secondUser = createUser(userRepo, name = "Test User 2")
 
         // == Create the family
         val familyRepo = FamilyRepository(db, logger)
-        val createdFamily =
-            familyRepo.createFamily(
-                TestData.familyDetailCreate.copy(invitees = listOf(secondUser.id))
-            )
+        val createdFamily = createFamily(familyRepo, invitees = listOf(secondUser.id))
 
         val inviteeMemberId = createdFamily.invitees?.firstOrNull()?.memberId
         assertNotNull(inviteeMemberId)
@@ -247,13 +232,11 @@ class FamilyRepositoryTest : FamilyTests() {
     fun testDemoteSingleMemberManager() = runTest {
         // Arrange
         // == Create a standard user
-        val userRepo = UserRepository(db, logger)
-        val createdUser =
-            userRepo.createUser(TestData.userDetailCreate.copy(type = UserType.STANDARD))
+        createUser()
 
         // == Create the family
         val familyRepo = FamilyRepository(db, logger)
-        val createdFamily = familyRepo.createFamily(TestData.familyDetailCreate)
+        val createdFamily = createFamily(familyRepo)
 
         val owningMember = createdFamily.members.singleOrNull { it.type == UserType.MANAGER }
 
@@ -275,14 +258,11 @@ class FamilyRepositoryTest : FamilyTests() {
     fun testRemoveSingleMemberManager() = runTest {
         // Arrange
         // == Create a standard user
-        val userRepo = UserRepository(db, logger)
-        val createdUser =
-            userRepo.createUser(TestData.userDetailCreate.copy(type = UserType.STANDARD))
+        createUser()
 
         // == Create the family
         val familyRepo = FamilyRepository(db, logger)
-        val createdFamily = familyRepo.createFamily(TestData.familyDetailCreate)
-
+        val createdFamily = createFamily(familyRepo)
         val owningMember = createdFamily.members.singleOrNull { it.type == UserType.MANAGER }
 
         // Act/Assert
@@ -298,28 +278,26 @@ class FamilyRepositoryTest : FamilyTests() {
     @Test
     fun testRemoveInviteeOrStandardFamilyMember() = runTest {
         // Arrange
-        // == Create a standard user
+        // == Create standard users
         val userRepo = UserRepository(db, logger)
-        val createdUser =
-            userRepo.createUser(TestData.userDetailCreate.copy(type = UserType.STANDARD))
-        val secondUser = userRepo.createUser(TestData.userDetailCreate.copy(name = "Test User 2"))
+        createUser(userRepo)
+        val secondUser = createUser(userRepo, name = "Test User 2")
 
         // == Create the family
         val familyRepo = FamilyRepository(db, logger)
-        val createdFamily =
-            familyRepo.createFamily(
-                TestData.familyDetailCreate.copy(invitees = listOf(secondUser.id))
-            )
+        val createdFamily = createFamily(familyRepo, invitees = listOf(secondUser.id))
 
         val inviteeMemberId = createdFamily.invitees?.firstOrNull()?.memberId
         assertNotNull(inviteeMemberId)
+
+        // Act
         val updatedFamily =
             familyRepo.leaveFamilyGroup(
                 familyId = createdFamily.id,
                 detail = FamilyMemberLeave(memberId = inviteeMemberId)
             )
 
-        // Act/Assert
+        // Assert
         assertNull(updatedFamily.invitees)
         assert(updatedFamily.members.count() == 1)
     }
@@ -327,18 +305,14 @@ class FamilyRepositoryTest : FamilyTests() {
     @Test
     fun testRemoveManagerOfCoManagedFamily() = runTest {
         // Arrange
-        // == Create a standard user
+        // == Create standard users
         val userRepo = UserRepository(db, logger)
-        val createdUser =
-            userRepo.createUser(TestData.userDetailCreate.copy(type = UserType.STANDARD))
-        val secondUser = userRepo.createUser(TestData.userDetailCreate.copy(name = "Test User 2"))
+        createUser(userRepo)
+        val secondUser = createUser(userRepo, name = "Test User 2")
 
         // == Create the family
         val familyRepo = FamilyRepository(db, logger)
-        val createdFamily =
-            familyRepo.createFamily(
-                TestData.familyDetailCreate.copy(invitees = listOf(secondUser.id))
-            )
+        val createdFamily = createFamily(familyRepo, invitees = listOf(secondUser.id))
 
         val inviteeMemberId = createdFamily.invitees?.firstOrNull()?.memberId
         assertNotNull(inviteeMemberId)
@@ -371,18 +345,14 @@ class FamilyRepositoryTest : FamilyTests() {
     @Test
     fun testRemoveNonExistentMember() = runTest {
         // Arrange
-        // == Create a standard user
+        // == Create standard users
         val userRepo = UserRepository(db, logger)
-        val createdUser =
-            userRepo.createUser(TestData.userDetailCreate.copy(type = UserType.STANDARD))
-        val secondUser = userRepo.createUser(TestData.userDetailCreate.copy(name = "Test User 2"))
+        createUser(userRepo)
+        val secondUser = createUser(userRepo, name = "Test User 2")
 
         // == Create the family
         val familyRepo = FamilyRepository(db, logger)
-        val createdFamily =
-            familyRepo.createFamily(
-                TestData.familyDetailCreate.copy(invitees = listOf(secondUser.id))
-            )
+        val createdFamily = createFamily(familyRepo, invitees = listOf(secondUser.id))
 
         // Act/Assert
         assertFailsWith<NotFoundException> {
