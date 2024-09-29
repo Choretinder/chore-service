@@ -130,13 +130,8 @@ internal class FamilyRepository(private val db: ChoreServiceDatabase, private va
         return if (targetMember == null) {
             throw NotFoundException("Verified member not found")
         } else {
-            if (db.familyDao().updateFamilyMember(targetMember) > 0) {
-                getFamilyDetail(familyId)
-            } else {
-                throw UnsupportedOperationException(
-                    "Failed to update the role for ${targetMember.memberId}"
-                )
-            }
+            db.familyDao().updateFamilyMember(targetMember)
+            getFamilyDetail(familyId)
         }
     }
 

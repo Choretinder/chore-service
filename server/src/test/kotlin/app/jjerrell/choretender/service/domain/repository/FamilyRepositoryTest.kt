@@ -20,11 +20,15 @@ package app.jjerrell.choretender.service.domain.repository
 import androidx.room.Room
 import androidx.sqlite.driver.bundled.BundledSQLiteDriver
 import app.jjerrell.choretender.service.database.ChoreServiceDatabase
+import app.jjerrell.choretender.service.domain.model.family.FamilyMemberChangeRole
+import app.jjerrell.choretender.service.domain.model.family.FamilyMemberVerify
 import app.jjerrell.choretender.service.domain.model.user.UserType
 import app.jjerrell.choretender.service.util.TestData
+import io.ktor.server.plugins.*
 import io.ktor.util.logging.*
 import kotlin.test.Test
 import kotlin.test.assertEquals
+import kotlin.test.assertFailsWith
 import kotlin.test.assertNotNull
 import kotlinx.coroutines.test.runTest
 import org.junit.After
@@ -126,5 +130,150 @@ class FamilyRepositoryTest {
 
         // Test
         assert(createdFamily.invitees?.count() == 1)
+    }
+
+    @Test
+    fun testVerifyFamilyMember() = runTest {
+        // Arrange
+        // == Create a standard user
+        val userRepo = UserRepository(db, logger)
+        val createdUser =
+            userRepo.createUser(TestData.userDetailCreate.copy(type = UserType.STANDARD))
+        val secondUser = userRepo.createUser(TestData.userDetailCreate.copy(name = "Test User 2"))
+
+        // == Create the family
+        val familyRepo = FamilyRepository(db, logger)
+        val createdFamily =
+            familyRepo.createFamily(
+                TestData.familyDetailCreate.copy(invitees = listOf(secondUser.id))
+            )
+
+        val inviteeMemberId = createdFamily.invitees?.firstOrNull()?.memberId
+        assertNotNull(inviteeMemberId)
+
+        // == Verify the invitee: `secondUser`
+        val updatedFamily =
+            familyRepo.verifyFamilyMember(
+                familyId = createdFamily.id,
+                detail = FamilyMemberVerify(memberId = inviteeMemberId)
+            )
+
+        // Test
+        assert(updatedFamily.invitees.isNullOrEmpty())
+        assert(updatedFamily.members.count() == 2)
+        assert(updatedFamily.members.all { it.isConfirmed })
+    }
+
+    @Test
+    fun testVerifyMissingFamilyMember() = runTest {
+        // Arrange
+        // == Create a standard user
+        val userRepo = UserRepository(db, logger)
+        val createdUser =
+            userRepo.createUser(TestData.userDetailCreate.copy(type = UserType.STANDARD))
+
+        // == Create the family
+        val familyRepo = FamilyRepository(db, logger)
+        val createdFamily = familyRepo.createFamily(TestData.familyDetailCreate)
+
+        // Test
+        assertFailsWith(NotFoundException::class) {
+            familyRepo.verifyFamilyMember(
+                familyId = createdFamily.id,
+                detail = FamilyMemberVerify(memberId = 2)
+            )
+        }
+    }
+
+    @Test
+    fun testVerifyExisingFamilyMember() = runTest {
+        // Arrange
+        // == Create a standard user
+        val userRepo = UserRepository(db, logger)
+        val createdUser =
+            userRepo.createUser(TestData.userDetailCreate.copy(type = UserType.STANDARD))
+
+        // == Create the family
+        val familyRepo = FamilyRepository(db, logger)
+        val createdFamily = familyRepo.createFamily(TestData.familyDetailCreate)
+
+        // Test
+        assertFailsWith(NotFoundException::class) {
+            familyRepo.verifyFamilyMember(
+                familyId = createdFamily.id,
+                detail = FamilyMemberVerify(memberId = 1)
+            )
+        }
+    }
+
+    @Test
+    fun testPromoteFamilyMember() = runTest {
+        // Arrange
+        // == Create a standard user
+        val userRepo = UserRepository(db, logger)
+        val createdUser =
+            userRepo.createUser(TestData.userDetailCreate.copy(type = UserType.STANDARD))
+        val secondUser = userRepo.createUser(TestData.userDetailCreate.copy(name = "Test User 2"))
+
+        // == Create the family
+        val familyRepo = FamilyRepository(db, logger)
+        val createdFamily =
+            familyRepo.createFamily(
+                TestData.familyDetailCreate.copy(invitees = listOf(secondUser.id))
+            )
+
+        val inviteeMemberId = createdFamily.invitees?.firstOrNull()?.memberId
+        assertNotNull(inviteeMemberId)
+
+        // == Verify the invitee: `secondUser`
+        familyRepo.verifyFamilyMember(
+            familyId = createdFamily.id,
+            detail = FamilyMemberVerify(memberId = inviteeMemberId)
+        )
+
+        // == Promote the invitee
+        val updatedFamily =
+            familyRepo.changeMemberRole(
+                familyId = createdFamily.id,
+                detail = FamilyMemberChangeRole(memberId = inviteeMemberId, role = UserType.MANAGER)
+            )
+
+        // Test
+        assert(updatedFamily.members.all { it.type == UserType.MANAGER })
+    }
+
+    @Test
+    fun testPromoteUnconfirmedOrMissingFamilyMember() = runTest {
+        // Arrange
+        // == Create a standard user
+        val userRepo = UserRepository(db, logger)
+        val createdUser =
+            userRepo.createUser(TestData.userDetailCreate.copy(type = UserType.STANDARD))
+        val secondUser = userRepo.createUser(TestData.userDetailCreate.copy(name = "Test User 2"))
+
+        // == Create the family
+        val familyRepo = FamilyRepository(db, logger)
+        val createdFamily =
+            familyRepo.createFamily(
+                TestData.familyDetailCreate.copy(invitees = listOf(secondUser.id))
+            )
+
+        val inviteeMemberId = createdFamily.invitees?.firstOrNull()?.memberId
+        assertNotNull(inviteeMemberId)
+
+        // Test
+        assertFailsWith(NotFoundException::class) {
+            familyRepo.changeMemberRole(
+                familyId = createdFamily.id,
+                detail = FamilyMemberChangeRole(memberId = inviteeMemberId, role = UserType.MANAGER)
+            )
+        }
+
+        assertFailsWith(NotFoundException::class) {
+            familyRepo.changeMemberRole(
+                familyId = createdFamily.id,
+                detail = FamilyMemberChangeRole(memberId = 3, role = UserType.MANAGER)
+            )
+        }
     }
 }
