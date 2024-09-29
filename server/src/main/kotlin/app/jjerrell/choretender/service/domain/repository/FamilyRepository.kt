@@ -172,7 +172,8 @@ private fun FamilyWithMembers.toFamilyDetail(): FamilyDetailRead {
     return FamilyDetailRead(
         id = family.familyId,
         name = family.familyName,
-        invitees = membersInviteesPair.second.map { it.toMemberDetail() },
+        invitees =
+            membersInviteesPair.second.map { it.toMemberDetail() }.takeUnless { it.isEmpty() },
         members = membersInviteesPair.first.map { it.toMemberDetail() },
         createdBy = family.createdBy,
         createdDate = family.createdDate,
