@@ -40,11 +40,11 @@ interface IChoreServiceFamilyRepository {
 }
 
 interface IChoreServiceUserRepository {
-    suspend fun getUserDetail(id: Long): UserDetailRead?
+    suspend fun getUserDetail(id: Long): UserDetailRead
 
-    suspend fun createUser(detail: UserDetailCreate): UserDetailRead?
+    suspend fun createUser(detail: UserDetailCreate): UserDetailRead
 
-    suspend fun updateUser(detail: UserDetailUpdate): UserDetailRead?
+    suspend fun updateUser(detail: UserDetailUpdate): UserDetailRead
 }
 
 interface IChoreServiceChoreRepository {
