@@ -21,15 +21,13 @@ import androidx.room.Room
 import androidx.sqlite.driver.bundled.BundledSQLiteDriver
 import app.jjerrell.choretender.service.database.ChoreServiceDatabase
 import app.jjerrell.choretender.service.domain.model.family.FamilyMemberChangeRole
+import app.jjerrell.choretender.service.domain.model.family.FamilyMemberLeave
 import app.jjerrell.choretender.service.domain.model.family.FamilyMemberVerify
 import app.jjerrell.choretender.service.domain.model.user.UserType
 import app.jjerrell.choretender.service.util.TestData
 import io.ktor.server.plugins.*
 import io.ktor.util.logging.*
-import kotlin.test.Test
-import kotlin.test.assertEquals
-import kotlin.test.assertFailsWith
-import kotlin.test.assertNotNull
+import kotlin.test.*
 import kotlinx.coroutines.test.runTest
 import org.junit.After
 import org.junit.Before
@@ -243,7 +241,7 @@ class FamilyRepositoryTest {
     }
 
     @Test
-    fun testPromoteUnconfirmedOrMissingFamilyMember() = runTest {
+    fun testChangeFamilyMemberRole() = runTest {
         // Arrange
         // == Create a standard user
         val userRepo = UserRepository(db, logger)
@@ -262,6 +260,7 @@ class FamilyRepositoryTest {
         assertNotNull(inviteeMemberId)
 
         // Test
+        // == Member is unconfirmed
         assertFailsWith(NotFoundException::class) {
             familyRepo.changeMemberRole(
                 familyId = createdFamily.id,
@@ -269,10 +268,161 @@ class FamilyRepositoryTest {
             )
         }
 
+        // == Member does not exist
         assertFailsWith(NotFoundException::class) {
             familyRepo.changeMemberRole(
                 familyId = createdFamily.id,
                 detail = FamilyMemberChangeRole(memberId = 3, role = UserType.MANAGER)
+            )
+        }
+    }
+
+    @Test
+    fun testDemoteSingleMemberManager() = runTest {
+        // Arrange
+        // == Create a standard user
+        val userRepo = UserRepository(db, logger)
+        val createdUser =
+            userRepo.createUser(TestData.userDetailCreate.copy(type = UserType.STANDARD))
+
+        // == Create the family
+        val familyRepo = FamilyRepository(db, logger)
+        val createdFamily = familyRepo.createFamily(TestData.familyDetailCreate)
+
+        val owningMember = createdFamily.members.singleOrNull { it.type == UserType.MANAGER }
+
+        // Act/Assert
+        assertNotNull(owningMember)
+        assertFailsWith<UnsupportedOperationException> {
+            familyRepo.changeMemberRole(
+                familyId = createdFamily.id,
+                detail =
+                    FamilyMemberChangeRole(
+                        memberId = owningMember.memberId,
+                        role = UserType.STANDARD
+                    )
+            )
+        }
+    }
+
+    @Test
+    fun testRemoveSingleMemberManager() = runTest {
+        // Arrange
+        // == Create a standard user
+        val userRepo = UserRepository(db, logger)
+        val createdUser =
+            userRepo.createUser(TestData.userDetailCreate.copy(type = UserType.STANDARD))
+
+        // == Create the family
+        val familyRepo = FamilyRepository(db, logger)
+        val createdFamily = familyRepo.createFamily(TestData.familyDetailCreate)
+
+        val owningMember = createdFamily.members.singleOrNull { it.type == UserType.MANAGER }
+
+        // Act/Assert
+        assertNotNull(owningMember)
+        assertFailsWith<UnsupportedOperationException> {
+            familyRepo.leaveFamilyGroup(
+                familyId = createdFamily.id,
+                detail = FamilyMemberLeave(memberId = owningMember.memberId)
+            )
+        }
+    }
+
+    @Test
+    fun testRemoveInviteeOrStandardFamilyMember() = runTest {
+        // Arrange
+        // == Create a standard user
+        val userRepo = UserRepository(db, logger)
+        val createdUser =
+            userRepo.createUser(TestData.userDetailCreate.copy(type = UserType.STANDARD))
+        val secondUser = userRepo.createUser(TestData.userDetailCreate.copy(name = "Test User 2"))
+
+        // == Create the family
+        val familyRepo = FamilyRepository(db, logger)
+        val createdFamily =
+            familyRepo.createFamily(
+                TestData.familyDetailCreate.copy(invitees = listOf(secondUser.id))
+            )
+
+        val inviteeMemberId = createdFamily.invitees?.firstOrNull()?.memberId
+        assertNotNull(inviteeMemberId)
+        val updatedFamily =
+            familyRepo.leaveFamilyGroup(
+                familyId = createdFamily.id,
+                detail = FamilyMemberLeave(memberId = inviteeMemberId)
+            )
+
+        // Act/Assert
+        assertNull(updatedFamily.invitees)
+        assert(updatedFamily.members.count() == 1)
+    }
+
+    @Test
+    fun testRemoveManagerOfCoManagedFamily() = runTest {
+        // Arrange
+        // == Create a standard user
+        val userRepo = UserRepository(db, logger)
+        val createdUser =
+            userRepo.createUser(TestData.userDetailCreate.copy(type = UserType.STANDARD))
+        val secondUser = userRepo.createUser(TestData.userDetailCreate.copy(name = "Test User 2"))
+
+        // == Create the family
+        val familyRepo = FamilyRepository(db, logger)
+        val createdFamily =
+            familyRepo.createFamily(
+                TestData.familyDetailCreate.copy(invitees = listOf(secondUser.id))
+            )
+
+        val inviteeMemberId = createdFamily.invitees?.firstOrNull()?.memberId
+        assertNotNull(inviteeMemberId)
+
+        // == Verify the invitee: `secondUser`
+        familyRepo.verifyFamilyMember(
+            familyId = createdFamily.id,
+            detail = FamilyMemberVerify(memberId = inviteeMemberId)
+        )
+
+        // == Promote the invitee
+        familyRepo.changeMemberRole(
+            familyId = createdFamily.id,
+            detail = FamilyMemberChangeRole(memberId = inviteeMemberId, role = UserType.MANAGER)
+        )
+
+        // Act
+        // == Remove the original member
+        val updatedFamily =
+            familyRepo.leaveFamilyGroup(
+                familyId = createdFamily.id,
+                detail = FamilyMemberLeave(memberId = 1)
+            )
+
+        // Assert
+        assert(updatedFamily.members.count() == 1)
+        assert(updatedFamily.members.first().memberId == 2L)
+    }
+
+    @Test
+    fun testRemoveNonExistentMember() = runTest {
+        // Arrange
+        // == Create a standard user
+        val userRepo = UserRepository(db, logger)
+        val createdUser =
+            userRepo.createUser(TestData.userDetailCreate.copy(type = UserType.STANDARD))
+        val secondUser = userRepo.createUser(TestData.userDetailCreate.copy(name = "Test User 2"))
+
+        // == Create the family
+        val familyRepo = FamilyRepository(db, logger)
+        val createdFamily =
+            familyRepo.createFamily(
+                TestData.familyDetailCreate.copy(invitees = listOf(secondUser.id))
+            )
+
+        // Act/Assert
+        assertFailsWith<NotFoundException> {
+            familyRepo.leaveFamilyGroup(
+                familyId = createdFamily.id,
+                detail = FamilyMemberLeave(memberId = 3)
             )
         }
     }

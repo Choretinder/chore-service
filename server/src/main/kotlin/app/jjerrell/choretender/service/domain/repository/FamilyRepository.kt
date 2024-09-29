@@ -123,14 +123,19 @@ internal class FamilyRepository(private val db: ChoreServiceDatabase, private va
     ): FamilyDetailRead {
         val members = db.familyDao().getFamilyWithMembers(familyId).members
         val targetMember =
-            members
-                .filter { it.isConfirmed }
-                .firstOrNull { it.memberId == detail.memberId }
-                ?.copy(role = detail.role.name)
+            members.filter { it.isConfirmed }.firstOrNull { it.memberId == detail.memberId }
+
         return if (targetMember == null) {
             throw NotFoundException("Verified member not found")
+        } else if (
+            targetMember.role == UserType.MANAGER.name &&
+                members.count { it.role == UserType.MANAGER.name } == 1
+        ) {
+            throw UnsupportedOperationException(
+                "Family contains a single Manager. Please promote another member first."
+            )
         } else {
-            db.familyDao().updateFamilyMember(targetMember)
+            db.familyDao().updateFamilyMember(targetMember.copy(role = detail.role.name))
             getFamilyDetail(familyId)
         }
     }
