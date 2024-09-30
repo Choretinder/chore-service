@@ -59,6 +59,8 @@ dependencies {
 
 room { schemaDirectory("$projectDir/schemas") }
 
+jacoco { toolVersion = "0.8.12" }
+
 tasks.withType<Test> {
     finalizedBy("jacocoTestReport") // Generate report after tests run
 }

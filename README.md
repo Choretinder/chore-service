@@ -1,7 +1,7 @@
 # Choretinder - Service
 
 [![Kotlin](https://img.shields.io/badge/kotlin-2.0.20-blue.svg?logo=kotlin)](http://kotlinlang.org)
-[![Coverage Status](https://coveralls.io/repos/github/Choretinder/chore-service/badge.svg?branch=main)](https://coveralls.io/github/Choretinder/chore-service?branch=main)
+[![Coverage Status](https://coveralls.io/repos/github/Choretinder/chore-service/badge.svg?branch=main&cache-control=no-cache)](https://coveralls.io/github/Choretinder/chore-service?branch=main&cache-control=no-cache)
 
 This is a Kotlin Multiplatform project targeting Server.
 
