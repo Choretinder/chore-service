@@ -55,6 +55,8 @@ dependencies {
     testImplementation("org.jetbrains.kotlinx:kotlinx-coroutines-test:1.9.0")
     testImplementation(libs.kotlin.test.junit)
     testImplementation("io.mockk:mockk:1.13.12")
+    testImplementation("io.insert-koin:koin-test:3.5.3")
+    testImplementation("io.insert-koin:koin-test-junit4:3.5.3")
 }
 
 room { schemaDirectory("$projectDir/schemas") }
