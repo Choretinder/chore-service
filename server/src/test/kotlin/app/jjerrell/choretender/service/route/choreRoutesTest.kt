@@ -20,6 +20,7 @@ package app.jjerrell.choretender.service.route
 import app.jjerrell.choretender.service.domain.model.chore.ChoreDetailRead
 import app.jjerrell.choretender.service.domain.repository.IChoreServiceChoreRepository
 import app.jjerrell.choretender.service.setupPlugins
+import app.jjerrell.choretender.service.setupRouting
 import app.jjerrell.choretender.service.util.TestData
 import io.ktor.client.call.*
 import io.ktor.client.plugins.contentnegotiation.*
@@ -51,26 +52,26 @@ class ChoreRoutesTest {
     fun `testChoreRoutes badRequest missingId`() = testApplication {
         application {
             setupPlugins()
-            routing { route("test") { choreRoutes() } }
+            setupRouting()
         }
 
-        val getChoresResponse = client.get("test/family/a/chore")
+        val getChoresResponse = client.get("v1/family/a/chore")
         assertEquals(HttpStatusCode.BadRequest, getChoresResponse.status)
         assertEquals("Missing or invalid ID", getChoresResponse.bodyAsText())
 
-        val getChoreInvalidFamilyResponse = client.get("test/family/a/chore/a")
+        val getChoreInvalidFamilyResponse = client.get("v1/family/a/chore/a")
         assertEquals(HttpStatusCode.BadRequest, getChoreInvalidFamilyResponse.status)
         assertEquals("Missing or invalid Family ID", getChoreInvalidFamilyResponse.bodyAsText())
 
-        val getChoreInvalidChoreResponse = client.get("test/family/1/chore/a")
+        val getChoreInvalidChoreResponse = client.get("v1/family/1/chore/a")
         assertEquals(HttpStatusCode.BadRequest, getChoreInvalidChoreResponse.status)
         assertEquals("Missing or invalid Chore ID", getChoreInvalidChoreResponse.bodyAsText())
 
-        val createChoreResponse = client.post("test/family/a/chore")
+        val createChoreResponse = client.post("v1/family/a/chore")
         assertEquals(HttpStatusCode.BadRequest, createChoreResponse.status)
         assertEquals("Missing or invalid ID", createChoreResponse.bodyAsText())
 
-        val updateChoreResponse = client.post("test/family/a/chore/update")
+        val updateChoreResponse = client.post("v1/family/a/chore/update")
         assertEquals(HttpStatusCode.BadRequest, updateChoreResponse.status)
         assertEquals("Missing or invalid ID", updateChoreResponse.bodyAsText())
     }
@@ -79,14 +80,14 @@ class ChoreRoutesTest {
     fun `testChoreRoutes badRequest invalidBody`() = testApplication {
         application {
             setupPlugins()
-            routing { route("test") { choreRoutes() } }
+            setupRouting()
         }
 
-        val createChoreResponse = client.post("test/family/1/chore")
+        val createChoreResponse = client.post("v1/family/1/chore")
         assertEquals(HttpStatusCode.BadRequest, createChoreResponse.status)
         assertEquals("Missing or invalid request body", createChoreResponse.bodyAsText())
 
-        val updateChoreResponse = client.post("test/family/1/chore/update")
+        val updateChoreResponse = client.post("v1/family/1/chore/update")
         assertEquals(HttpStatusCode.BadRequest, updateChoreResponse.status)
         assertEquals("Missing or invalid request body", updateChoreResponse.bodyAsText())
     }
@@ -96,24 +97,24 @@ class ChoreRoutesTest {
         val client = createClient { install(ContentNegotiation) { json() } }
         application {
             setupPlugins()
-            routing { route("test") { choreRoutes() } }
+            setupRouting()
         }
 
-        val getChoresResponse = client.get("test/family/1/chore")
+        val getChoresResponse = client.get("v1/family/1/chore")
         assertEquals(HttpStatusCode.InternalServerError, getChoresResponse.status)
 
-        val getChoreInvalidFamilyResponse = client.get("test/family/1/chore/1")
+        val getChoreInvalidFamilyResponse = client.get("v1/family/1/chore/1")
         assertEquals(HttpStatusCode.InternalServerError, getChoreInvalidFamilyResponse.status)
 
         val createChoreResponse =
-            client.post("test/family/1/chore") {
+            client.post("v1/family/1/chore") {
                 contentType(ContentType.Application.Json)
                 setBody(TestData.choreDetailCreate)
             }
         assertEquals(HttpStatusCode.InternalServerError, createChoreResponse.status)
 
         val updateChoreResponse =
-            client.post("test/family/1/chore/update") {
+            client.post("v1/family/1/chore/update") {
                 contentType(ContentType.Application.Json)
                 setBody(TestData.choreDetailUpdate)
             }
@@ -137,10 +138,10 @@ class ChoreRoutesTest {
                     }
                 )
             }
-            routing { route("test") { choreRoutes() } }
+            setupRouting()
         }
 
-        val getChoresResponse = client.get("test/family/1/chore")
+        val getChoresResponse = client.get("v1/family/1/chore")
         assertEquals(HttpStatusCode.OK, getChoresResponse.status)
         assertEquals(
             listOf(TestData.choreDetailReadOne, TestData.choreDetailReadTwo),
@@ -165,10 +166,10 @@ class ChoreRoutesTest {
                     }
                 )
             }
-            routing { route("test") { choreRoutes() } }
+            setupRouting()
         }
 
-        val getChoreResponse = client.get("test/family/1/chore/1")
+        val getChoreResponse = client.get("v1/family/1/chore/1")
         assertEquals(HttpStatusCode.OK, getChoreResponse.status)
         assertEquals(TestData.choreDetailReadOne, getChoreResponse.body<ChoreDetailRead>())
     }
@@ -191,11 +192,11 @@ class ChoreRoutesTest {
                     }
                 )
             }
-            routing { route("test") { choreRoutes() } }
+            setupRouting()
         }
 
         val createChoreResponse =
-            client.post("test/family/1/chore") {
+            client.post("v1/family/1/chore") {
                 contentType(ContentType.Application.Json)
                 setBody(TestData.choreDetailCreate)
             }
@@ -221,11 +222,11 @@ class ChoreRoutesTest {
                     }
                 )
             }
-            routing { route("test") { choreRoutes() } }
+            setupRouting()
         }
 
         val updateChoreResponse =
-            client.post("test/family/1/chore/update") {
+            client.post("v1/family/1/chore/update") {
                 contentType(ContentType.Application.Json)
                 setBody(TestData.choreDetailUpdate)
             }

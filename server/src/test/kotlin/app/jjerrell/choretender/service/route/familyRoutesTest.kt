@@ -20,6 +20,7 @@ package app.jjerrell.choretender.service.route
 import app.jjerrell.choretender.service.domain.model.family.FamilyDetailRead
 import app.jjerrell.choretender.service.domain.repository.IChoreServiceFamilyRepository
 import app.jjerrell.choretender.service.setupPlugins
+import app.jjerrell.choretender.service.setupRouting
 import app.jjerrell.choretender.service.util.TestData
 import io.ktor.client.call.*
 import io.ktor.client.plugins.contentnegotiation.*
@@ -51,27 +52,27 @@ class FamilyRoutesTest {
     fun `testFamilyRoutes badRequest missingId`() = testApplication {
         application {
             setupPlugins()
-            routing { route("test") { familyRoutes() } }
+            setupRouting()
         }
 
         // Expected to match the {familyId} sub route but fail because 'a' cannot be cast to a Long
-        val getIdResponse = client.get("test/family/a")
+        val getIdResponse = client.get("v1/family/a")
         assertEquals(HttpStatusCode.BadRequest, getIdResponse.status)
         assertEquals("Missing or invalid ID", getIdResponse.bodyAsText())
 
-        val postIdInviteResponse = client.post("test/family/a/invite")
+        val postIdInviteResponse = client.post("v1/family/a/invite")
         assertEquals(HttpStatusCode.BadRequest, postIdInviteResponse.status)
         assertEquals("Missing or invalid ID", postIdInviteResponse.bodyAsText())
 
-        val postIdLeaveResponse = client.post("test/family/a/leave")
+        val postIdLeaveResponse = client.post("v1/family/a/leave")
         assertEquals(HttpStatusCode.BadRequest, postIdLeaveResponse.status)
         assertEquals("Missing or invalid ID", postIdLeaveResponse.bodyAsText())
 
-        val postIdVerifyResponse = client.post("test/family/a/verify")
+        val postIdVerifyResponse = client.post("v1/family/a/verify")
         assertEquals(HttpStatusCode.BadRequest, postIdVerifyResponse.status)
         assertEquals("Missing or invalid ID", postIdVerifyResponse.bodyAsText())
 
-        val postIdRoleResponse = client.post("test/family/a/role")
+        val postIdRoleResponse = client.post("v1/family/a/role")
         assertEquals(HttpStatusCode.BadRequest, postIdRoleResponse.status)
         assertEquals("Missing or invalid ID", postIdRoleResponse.bodyAsText())
     }
@@ -80,27 +81,27 @@ class FamilyRoutesTest {
     fun `testFamilyRoutes badRequest invalidBody`() = testApplication {
         application {
             setupPlugins()
-            routing { route("test") { familyRoutes() } }
+            setupRouting()
         }
 
-        val familyCreateResponse = client.post("test/family")
+        val familyCreateResponse = client.post("v1/family")
         assertEquals(HttpStatusCode.BadRequest, familyCreateResponse.status)
         assertEquals("Missing or invalid request body", familyCreateResponse.bodyAsText())
 
         // Expected to match the {familyId} sub route but fail due to a missing request body
-        val postIdInviteResponse = client.post("test/family/1/invite")
+        val postIdInviteResponse = client.post("v1/family/1/invite")
         assertEquals(HttpStatusCode.BadRequest, postIdInviteResponse.status)
         assertEquals("Missing or invalid request body", postIdInviteResponse.bodyAsText())
 
-        val postIdLeaveResponse = client.post("test/family/1/leave")
+        val postIdLeaveResponse = client.post("v1/family/1/leave")
         assertEquals(HttpStatusCode.BadRequest, postIdLeaveResponse.status)
         assertEquals("Missing or invalid request body", postIdLeaveResponse.bodyAsText())
 
-        val postIdVerifyResponse = client.post("test/family/1/verify")
+        val postIdVerifyResponse = client.post("v1/family/1/verify")
         assertEquals(HttpStatusCode.BadRequest, postIdVerifyResponse.status)
         assertEquals("Missing or invalid request body", postIdVerifyResponse.bodyAsText())
 
-        val postIdRoleResponse = client.post("test/family/1/role")
+        val postIdRoleResponse = client.post("v1/family/1/role")
         assertEquals(HttpStatusCode.BadRequest, postIdRoleResponse.status)
         assertEquals("Missing or invalid request body", postIdRoleResponse.bodyAsText())
     }
@@ -110,43 +111,43 @@ class FamilyRoutesTest {
         val client = createClient { install(ContentNegotiation) { json() } }
         application {
             setupPlugins()
-            routing { route("test") { familyRoutes() } }
+            setupRouting()
         }
 
         // Expected to fail with a server error because DI isn't configured
         val createFamilyResponse =
-            client.post("test/family") {
+            client.post("v1/family") {
                 contentType(ContentType.Application.Json)
                 setBody(TestData.familyDetailCreate)
             }
         assertEquals(HttpStatusCode.InternalServerError, createFamilyResponse.status)
 
-        val getIdResponse = client.get("test/family/1")
+        val getIdResponse = client.get("v1/family/1")
         assertEquals(HttpStatusCode.InternalServerError, getIdResponse.status)
 
         val inviteToFamilyResponse =
-            client.post("test/family/1/invite") {
+            client.post("v1/family/1/invite") {
                 contentType(ContentType.Application.Json)
                 setBody(TestData.familyDetailInvite)
             }
         assertEquals(HttpStatusCode.InternalServerError, inviteToFamilyResponse.status)
 
         val leaveFamilyResponse =
-            client.post("test/family/1/leave") {
+            client.post("v1/family/1/leave") {
                 contentType(ContentType.Application.Json)
                 setBody(TestData.familyDetailLeave)
             }
         assertEquals(HttpStatusCode.InternalServerError, leaveFamilyResponse.status)
 
         val verifyMemberResponse =
-            client.post("test/family/1/verify") {
+            client.post("v1/family/1/verify") {
                 contentType(ContentType.Application.Json)
                 setBody(TestData.familyMemberVerify)
             }
         assertEquals(HttpStatusCode.InternalServerError, verifyMemberResponse.status)
 
         val promoteMemberResponse =
-            client.post("test/family/1/role") {
+            client.post("v1/family/1/role") {
                 contentType(ContentType.Application.Json)
                 setBody(TestData.familyMemberPromote)
             }
@@ -170,11 +171,11 @@ class FamilyRoutesTest {
                     }
                 )
             }
-            routing { route("test") { familyRoutes() } }
+            setupRouting()
         }
 
         val createFamilyResponse =
-            client.post("test/family") {
+            client.post("v1/family") {
                 contentType(ContentType.Application.Json)
                 setBody(TestData.familyDetailCreate)
             }
@@ -199,10 +200,10 @@ class FamilyRoutesTest {
                     }
                 )
             }
-            routing { route("test") { familyRoutes() } }
+            setupRouting()
         }
 
-        val getFamilyResponse = client.get("test/family/1")
+        val getFamilyResponse = client.get("v1/family/1")
         assertEquals(HttpStatusCode.OK, getFamilyResponse.status)
         assertEquals(TestData.familyDetailRead, getFamilyResponse.body<FamilyDetailRead>())
     }
@@ -228,11 +229,11 @@ class FamilyRoutesTest {
                     }
                 )
             }
-            routing { route("test") { familyRoutes() } }
+            setupRouting()
         }
 
         val inviteFamilyResponse =
-            client.post("test/family/1/invite") {
+            client.post("v1/family/1/invite") {
                 contentType(ContentType.Application.Json)
                 setBody(TestData.familyDetailInvite)
             }
@@ -261,11 +262,11 @@ class FamilyRoutesTest {
                     }
                 )
             }
-            routing { route("test") { familyRoutes() } }
+            setupRouting()
         }
 
         val leaveFamilyResponse =
-            client.post("test/family/1/leave") {
+            client.post("v1/family/1/leave") {
                 contentType(ContentType.Application.Json)
                 setBody(TestData.familyDetailLeave)
             }
@@ -294,11 +295,11 @@ class FamilyRoutesTest {
                     }
                 )
             }
-            routing { route("test") { familyRoutes() } }
+            setupRouting()
         }
 
         val verifyFamilyMemberResponse =
-            client.post("test/family/1/verify") {
+            client.post("v1/family/1/verify") {
                 contentType(ContentType.Application.Json)
                 setBody(TestData.familyMemberVerify)
             }
@@ -327,11 +328,11 @@ class FamilyRoutesTest {
                     }
                 )
             }
-            routing { route("test") { familyRoutes() } }
+            setupRouting()
         }
 
         val promoteFamilyMemberResponse =
-            client.post("test/family/1/role") {
+            client.post("v1/family/1/role") {
                 contentType(ContentType.Application.Json)
                 setBody(TestData.familyMemberPromote)
             }

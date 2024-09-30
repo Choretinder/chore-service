@@ -22,6 +22,7 @@ import app.jjerrell.choretender.service.domain.model.user.UserDetailUpdate
 import app.jjerrell.choretender.service.domain.model.user.UserType
 import app.jjerrell.choretender.service.domain.repository.IChoreServiceUserRepository
 import app.jjerrell.choretender.service.setupPlugins
+import app.jjerrell.choretender.service.setupRouting
 import app.jjerrell.choretender.service.util.TestData
 import io.ktor.client.plugins.contentnegotiation.*
 import io.ktor.client.request.*
@@ -52,15 +53,15 @@ class UserRoutesTest {
     fun `testUserRoutes badRequest`() = testApplication {
         application {
             setupPlugins()
-            routing { route("test") { userRoutes() } }
+            setupRouting()
         }
 
         // Expected to match the `{id?}` route but fail due to missing ID
-        assertEquals(HttpStatusCode.BadRequest, client.get("test/user").status)
+        assertEquals(HttpStatusCode.BadRequest, client.get("v1/user").status)
 
         // Expected to throw due to missing request body transformation
-        assertEquals(HttpStatusCode.BadRequest, client.post("test/user").status)
-        assertEquals(HttpStatusCode.BadRequest, client.put("test/user").status)
+        assertEquals(HttpStatusCode.BadRequest, client.post("v1/user").status)
+        assertEquals(HttpStatusCode.BadRequest, client.put("v1/user").status)
     }
 
     @Test
@@ -68,15 +69,15 @@ class UserRoutesTest {
         val client = createClient { install(ContentNegotiation) { json() } }
         application {
             setupPlugins()
-            routing { route("test") { userRoutes() } }
+            setupRouting()
         }
 
         // Expected to throw due to missing DI setup
-        assertEquals(HttpStatusCode.InternalServerError, client.get("test/user/1").status)
+        assertEquals(HttpStatusCode.InternalServerError, client.get("v1/user/1").status)
         assertEquals(
             HttpStatusCode.InternalServerError,
             client
-                .post("test/user") {
+                .post("v1/user") {
                     contentType(ContentType.Application.Json)
                     setBody(
                         UserDetailCreate(
@@ -92,7 +93,7 @@ class UserRoutesTest {
         assertEquals(
             HttpStatusCode.InternalServerError,
             client
-                .put("test/user") {
+                .put("v1/user") {
                     contentType(ContentType.Application.Json)
                     setBody(
                         UserDetailUpdate(
@@ -126,15 +127,15 @@ class UserRoutesTest {
                     }
                 )
             }
-            routing { route("test") { userRoutes() } }
+            setupRouting()
         }
 
         // Expected to give a 404 due to all requests returning null
-        assertEquals(HttpStatusCode.NotFound, client.get("test/user/1").status)
+        assertEquals(HttpStatusCode.NotFound, client.get("v1/user/1").status)
         assertEquals(
             HttpStatusCode.NotFound,
             client
-                .post("test/user") {
+                .post("v1/user") {
                     contentType(ContentType.Application.Json)
                     setBody(
                         UserDetailCreate(
@@ -150,7 +151,7 @@ class UserRoutesTest {
         assertEquals(
             HttpStatusCode.NotFound,
             client
-                .put("test/user") {
+                .put("v1/user") {
                     contentType(ContentType.Application.Json)
                     setBody(
                         UserDetailUpdate(
@@ -184,15 +185,15 @@ class UserRoutesTest {
                     }
                 )
             }
-            routing { route("test") { userRoutes() } }
+            setupRouting()
         }
 
         // Expected to give a 404 due to all requests returning null
-        assertEquals(HttpStatusCode.OK, client.get("test/user/1").status)
+        assertEquals(HttpStatusCode.OK, client.get("v1/user/1").status)
         assertEquals(
             HttpStatusCode.OK,
             client
-                .post("test/user") {
+                .post("v1/user") {
                     contentType(ContentType.Application.Json)
                     setBody(
                         UserDetailCreate(
@@ -208,7 +209,7 @@ class UserRoutesTest {
         assertEquals(
             HttpStatusCode.OK,
             client
-                .put("test/user") {
+                .put("v1/user") {
                     contentType(ContentType.Application.Json)
                     setBody(
                         UserDetailUpdate(
