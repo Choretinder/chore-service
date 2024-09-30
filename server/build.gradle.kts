@@ -73,10 +73,6 @@ tasks.jacocoTestReport {
         html.required.set(true) // Optional: Enable HTML reports
     }
     classDirectories.setFrom(
-        files(
-            classDirectories.files.map {
-                fileTree(it) { exclude("**/generated/**", "**/database/**") }
-            }
-        )
+        files(classDirectories.files.map { fileTree(it) { exclude("**/database/service/**") } })
     )
 }

@@ -15,7 +15,7 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-package app.jjerrell.choretender.service.database
+package app.jjerrell.choretender.service.database.service
 
 import androidx.room.Database
 import androidx.room.Room

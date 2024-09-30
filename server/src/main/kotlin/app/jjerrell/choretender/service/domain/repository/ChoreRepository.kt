@@ -17,8 +17,8 @@
  */
 package app.jjerrell.choretender.service.domain.repository
 
-import app.jjerrell.choretender.service.database.ChoreServiceDatabase
 import app.jjerrell.choretender.service.database.entity.ChoreEntity
+import app.jjerrell.choretender.service.database.service.ChoreServiceDatabase
 import app.jjerrell.choretender.service.domain.model.chore.*
 import io.ktor.util.logging.*
 

@@ -19,7 +19,7 @@ package app.jjerrell.choretender.service.domain.repository
 
 import androidx.room.Room
 import androidx.sqlite.driver.bundled.BundledSQLiteDriver
-import app.jjerrell.choretender.service.database.ChoreServiceDatabase
+import app.jjerrell.choretender.service.database.service.ChoreServiceDatabase
 import app.jjerrell.choretender.service.domain.model.user.UserType
 import app.jjerrell.choretender.service.util.TestData
 import io.ktor.util.logging.*

@@ -17,10 +17,10 @@
  */
 package app.jjerrell.choretender.service.domain.repository
 
-import app.jjerrell.choretender.service.database.ChoreServiceDatabase
 import app.jjerrell.choretender.service.database.entity.FamilyEntity
 import app.jjerrell.choretender.service.database.entity.FamilyMemberEntity
 import app.jjerrell.choretender.service.database.entity.FamilyWithMembers
+import app.jjerrell.choretender.service.database.service.ChoreServiceDatabase
 import app.jjerrell.choretender.service.domain.model.family.*
 import app.jjerrell.choretender.service.domain.model.user.UserType
 import io.ktor.server.plugins.*
