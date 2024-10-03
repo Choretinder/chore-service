@@ -22,6 +22,7 @@ import androidx.sqlite.driver.bundled.BundledSQLiteDriver
 import app.jjerrell.choretender.service.database.service.ChoreServiceDatabase
 import app.jjerrell.choretender.service.domain.model.chore.ChoreDetailRead
 import app.jjerrell.choretender.service.domain.model.family.FamilyDetailRead
+import app.jjerrell.choretender.service.domain.model.family.FamilyMemberVerify
 import app.jjerrell.choretender.service.domain.model.user.UserDetailRead
 import app.jjerrell.choretender.service.domain.model.user.UserType
 import app.jjerrell.choretender.service.domain.repository.*
@@ -30,6 +31,15 @@ import app.jjerrell.choretender.service.domain.repository.UserRepository
 import io.ktor.util.logging.*
 import org.junit.After
 import org.junit.Before
+
+data class TestFamilySetup(
+    val managerUserId: Long,
+    val inviteeUserId: Long,
+    val familyId: Long,
+    val managerMemberId: Long,
+    val inviteeMemberId: Long,
+    val choreId: Long
+)
 
 abstract class FamilyTests {
     protected lateinit var db: ChoreServiceDatabase
@@ -70,6 +80,31 @@ abstract class FamilyTests {
         return repo.createChore(
             familyId = TestData.familyDetailRead.id,
             detail = TestData.choreDetailCreate.copy(name = name)
+        )
+    }
+
+    suspend fun setupTestFamily(): TestFamilySetup {
+        // Create the users
+        val userRepo = UserRepository(db, logger)
+        val managerUser = createUser(userRepo, type = UserType.MANAGER)
+        val inviteeUser = createUser(userRepo)
+        // Create the family
+        val familyRepo = FamilyRepository(db, logger)
+        val familyRead = createFamily(familyRepo, invitees = listOf(inviteeUser.id))
+        // Confirm the invitee
+        val inviteeMemberRead =
+            familyRepo.verifyFamilyMember(
+                familyId = familyRead.id,
+                detail = FamilyMemberVerify(memberId = familyRead.invitees?.first()?.memberId!!)
+            )
+
+        return TestFamilySetup(
+            managerUserId = managerUser.id,
+            inviteeUserId = inviteeUser.id,
+            familyId = familyRead.id,
+            managerMemberId = familyRead.members.find { it.id == managerUser.id }?.memberId!!,
+            inviteeMemberId = inviteeMemberRead.id,
+            choreId = createChore().id
         )
     }
 }

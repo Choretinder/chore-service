@@ -19,36 +19,36 @@ package app.jjerrell.choretender.service.database.entity
 
 import androidx.room.*
 
-// FamilyEntity represents a family
-@Entity(tableName = "family")
-data class FamilyEntity(
-    @PrimaryKey(autoGenerate = true) val familyId: Long = 0,
-    val familyName: String,
-    val createdBy: Long,
-    val createdDate: Long,
-    val updatedBy: Long?,
-    val updatedDate: Long?
-)
-
 @Entity(
-    tableName = "family_member",
+    tableName = "chore_assignment",
     foreignKeys =
         [
             ForeignKey(
-                entity = FamilyEntity::class,
-                parentColumns = ["familyId"],
-                childColumns = ["familyId"],
+                entity = FamilyMemberEntity::class,
+                parentColumns = ["memberId"],
+                childColumns = ["assigneeId"],
+                onDelete = ForeignKey.CASCADE
+            ),
+            ForeignKey(
+                entity = ChoreEntity::class,
+                parentColumns = ["choreId"],
+                childColumns = ["choreId"],
                 onDelete = ForeignKey.CASCADE
             )
         ],
-    indices = [Index(value = ["familyId"])]
+    indices = [Index(value = ["assigneeId"]), Index(value = ["choreId"])]
 )
-data class FamilyMemberEntity(
-    @PrimaryKey(autoGenerate = true) val memberId: Long = 0,
-    val familyId: Long,
-    @Embedded(prefix = "user_") val user: UserEntity,
-    val role: String,
-    val isConfirmed: Boolean,
-    val invitedBy: Long,
-    val invitedDate: Long
+data class ChoreAssignment(
+    @PrimaryKey(autoGenerate = true) val assignmentId: Long = 0,
+    val assigneeId: Long,
+    val choreId: Long,
+    val assignmentStatus: String,
+    val assignmentDate: Long,
+    val statusDate: Long = assignmentDate
+)
+
+data class FamilyMemberWithAssignments(
+    @Embedded val member: FamilyMemberEntity,
+    @Relation(parentColumn = "memberId", entityColumn = "assignmentId")
+    val assignments: List<ChoreAssignment>
 )
