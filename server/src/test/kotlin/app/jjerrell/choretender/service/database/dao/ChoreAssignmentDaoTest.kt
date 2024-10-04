@@ -46,8 +46,7 @@ class ChoreAssignmentDaoTest : FamilyTests() {
         val memberWithAssignments =
             db.choreAssignmentDao()
                 .getFamilyMemberWithAssignments(assigneeId = testFamilyDetail.managerMemberId)
-        val createdAssignment =
-            memberWithAssignments.assignments.first { it.assigneeId == assignmentId }
+        val createdAssignment = memberWithAssignments.assignmentsWithChore.first().assignment
 
         // Assert
         assertTrue(assignmentId > 0)
@@ -77,8 +76,7 @@ class ChoreAssignmentDaoTest : FamilyTests() {
         val memberWithAssignments =
             db.choreAssignmentDao()
                 .getFamilyMemberWithAssignments(assigneeId = testFamilyDetail.managerMemberId)
-        val createdAssignment =
-            memberWithAssignments.assignments.first { it.assigneeId == assignmentId }
+        val createdAssignment = memberWithAssignments.assignmentsWithChore.first().assignment
 
         // Act
         val updatedTime = Clock.System.now()
@@ -137,8 +135,7 @@ class ChoreAssignmentDaoTest : FamilyTests() {
         val memberWithAssignments =
             db.choreAssignmentDao()
                 .getFamilyMemberWithAssignments(assigneeId = testFamilyDetail.managerMemberId)
-        val createdAssignment =
-            memberWithAssignments.assignments.first { it.assigneeId == assignmentId }
+        val createdAssignment = memberWithAssignments.assignmentsWithChore.first().assignment
 
         // Act
         val removeAssignmentResult = db.choreAssignmentDao().removeAssignment(createdAssignment)

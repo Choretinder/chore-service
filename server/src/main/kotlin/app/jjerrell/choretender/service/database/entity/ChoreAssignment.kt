@@ -47,8 +47,17 @@ data class ChoreAssignment(
     val statusDate: Long = assignmentDate
 )
 
+data class ChoreAssignmentWithChore(
+    @Embedded val assignment: ChoreAssignment,
+    @Relation(parentColumn = "choreId", entityColumn = "choreId") val chore: ChoreEntity
+)
+
 data class FamilyMemberWithAssignments(
     @Embedded val member: FamilyMemberEntity,
-    @Relation(parentColumn = "memberId", entityColumn = "assignmentId")
-    val assignments: List<ChoreAssignment>
+    @Relation(
+        entity = ChoreAssignment::class,
+        parentColumn = "memberId",
+        entityColumn = "assigneeId"
+    )
+    val assignmentsWithChore: List<ChoreAssignmentWithChore>
 )
