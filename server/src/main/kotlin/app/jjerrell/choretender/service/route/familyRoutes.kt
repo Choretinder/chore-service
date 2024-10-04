@@ -19,7 +19,7 @@ package app.jjerrell.choretender.service.route
 
 import app.jjerrell.choretender.service.PARAM_FAMILY_ID
 import app.jjerrell.choretender.service.domain.model.family.*
-import app.jjerrell.choretender.service.domain.repository.IChoreServiceFamilyRepository
+import app.jjerrell.choretender.service.domain.repository.IFamilyRepository
 import io.ktor.http.*
 import io.ktor.server.application.*
 import io.ktor.server.request.*
@@ -28,7 +28,7 @@ import io.ktor.server.routing.*
 import org.koin.ktor.ext.inject
 
 internal fun Route.familyRoutes() {
-    val familyRepository by inject<IChoreServiceFamilyRepository>()
+    val familyRepository by inject<IFamilyRepository>()
 
     route("family") {
         post {

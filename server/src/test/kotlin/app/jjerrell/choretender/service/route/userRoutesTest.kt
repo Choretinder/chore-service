@@ -20,7 +20,7 @@ package app.jjerrell.choretender.service.route
 import app.jjerrell.choretender.service.domain.model.user.UserDetailCreate
 import app.jjerrell.choretender.service.domain.model.user.UserDetailUpdate
 import app.jjerrell.choretender.service.domain.model.user.UserType
-import app.jjerrell.choretender.service.domain.repository.IChoreServiceUserRepository
+import app.jjerrell.choretender.service.domain.repository.IUserRepository
 import app.jjerrell.choretender.service.setupPlugins
 import app.jjerrell.choretender.service.setupRouting
 import app.jjerrell.choretender.service.util.TestData
@@ -117,7 +117,7 @@ class UserRoutesTest {
             install(Koin) {
                 modules(
                     module {
-                        factory<IChoreServiceUserRepository> {
+                        factory<IUserRepository> {
                             mockk {
                                 coEvery { getUserDetail(any()) } throws NotFoundException()
                                 coEvery { createUser(any()) } throws NotFoundException()
@@ -175,7 +175,7 @@ class UserRoutesTest {
             install(Koin) {
                 modules(
                     module {
-                        factory<IChoreServiceUserRepository> {
+                        factory<IUserRepository> {
                             mockk {
                                 coEvery { getUserDetail(any()) } returns TestData.defaultUser
                                 coEvery { createUser(any()) } returns TestData.defaultUser

@@ -22,8 +22,18 @@ import app.jjerrell.choretender.service.database.service.ChoreServiceDatabase
 import app.jjerrell.choretender.service.domain.model.chore.*
 import io.ktor.util.logging.*
 
+interface IChoreRepository {
+    suspend fun getChoreDetail(familyId: Long, choreId: Long): ChoreDetailRead
+
+    suspend fun getFamilyChoreDetails(familyId: Long): List<ChoreDetailRead>
+
+    suspend fun createChore(familyId: Long, detail: ChoreDetailCreate): ChoreDetailRead
+
+    suspend fun updateChore(familyId: Long, detail: ChoreDetailUpdate): ChoreDetailRead
+}
+
 internal class ChoreRepository(private val db: ChoreServiceDatabase, private val logger: Logger) :
-    IChoreServiceChoreRepository {
+    IChoreRepository {
 
     override suspend fun getChoreDetail(familyId: Long, choreId: Long): ChoreDetailRead {
         return db.familyDao().getChore(familyId, choreId).convertToDetail()
@@ -62,7 +72,7 @@ internal class ChoreRepository(private val db: ChoreServiceDatabase, private val
     }
 }
 
-private fun ChoreEntity.convertToDetail() =
+internal fun ChoreEntity.convertToDetail() =
     ChoreDetailRead(
         id = choreId,
         name = name,

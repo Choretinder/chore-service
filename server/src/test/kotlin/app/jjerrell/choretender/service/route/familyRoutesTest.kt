@@ -18,7 +18,7 @@
 package app.jjerrell.choretender.service.route
 
 import app.jjerrell.choretender.service.domain.model.family.FamilyDetailRead
-import app.jjerrell.choretender.service.domain.repository.IChoreServiceFamilyRepository
+import app.jjerrell.choretender.service.domain.repository.IFamilyRepository
 import app.jjerrell.choretender.service.setupPlugins
 import app.jjerrell.choretender.service.setupRouting
 import app.jjerrell.choretender.service.util.TestData
@@ -162,7 +162,7 @@ class FamilyRoutesTest {
             install(Koin) {
                 modules(
                     module {
-                        factory<IChoreServiceFamilyRepository> {
+                        factory<IFamilyRepository> {
                             mockk {
                                 coEvery { createFamily(TestData.familyDetailCreate) } returns
                                     TestData.familyDetailRead
@@ -191,7 +191,7 @@ class FamilyRoutesTest {
             install(Koin) {
                 modules(
                     module {
-                        factory<IChoreServiceFamilyRepository> {
+                        factory<IFamilyRepository> {
                             mockk {
                                 coEvery { getFamilyDetail(id = 1) } returns
                                     TestData.familyDetailRead
@@ -216,7 +216,7 @@ class FamilyRoutesTest {
             install(Koin) {
                 modules(
                     module {
-                        factory<IChoreServiceFamilyRepository> {
+                        factory<IFamilyRepository> {
                             mockk {
                                 coEvery {
                                     inviteFamilyMember(
@@ -249,7 +249,7 @@ class FamilyRoutesTest {
             install(Koin) {
                 modules(
                     module {
-                        factory<IChoreServiceFamilyRepository> {
+                        factory<IFamilyRepository> {
                             mockk {
                                 coEvery {
                                     leaveFamilyGroup(
@@ -282,7 +282,7 @@ class FamilyRoutesTest {
             install(Koin) {
                 modules(
                     module {
-                        factory<IChoreServiceFamilyRepository> {
+                        factory<IFamilyRepository> {
                             mockk {
                                 coEvery {
                                     verifyFamilyMember(
@@ -315,7 +315,7 @@ class FamilyRoutesTest {
             install(Koin) {
                 modules(
                     module {
-                        factory<IChoreServiceFamilyRepository> {
+                        factory<IFamilyRepository> {
                             mockk {
                                 coEvery {
                                     changeMemberRole(

@@ -59,7 +59,7 @@ abstract class FamilyTests {
     }
 
     suspend fun createUser(
-        repo: IChoreServiceUserRepository = UserRepository(db, logger),
+        repo: IUserRepository = UserRepository(db, logger),
         name: String = "Test",
         type: UserType = UserType.STANDARD
     ): UserDetailRead {
@@ -67,14 +67,14 @@ abstract class FamilyTests {
     }
 
     suspend fun createFamily(
-        repo: IChoreServiceFamilyRepository = FamilyRepository(db, logger),
+        repo: IFamilyRepository = FamilyRepository(db, logger),
         invitees: List<Long>? = null
     ): FamilyDetailRead {
         return repo.createFamily(TestData.familyDetailCreate.copy(invitees = invitees))
     }
 
     suspend fun createChore(
-        repo: IChoreServiceChoreRepository = ChoreRepository(db, logger),
+        repo: IChoreRepository = ChoreRepository(db, logger),
         name: String = "Test"
     ): ChoreDetailRead {
         return repo.createChore(

@@ -28,8 +28,16 @@ import app.jjerrell.choretender.service.domain.model.user.UserDetailUpdate
 import app.jjerrell.choretender.service.domain.model.user.UserType
 import io.ktor.util.logging.*
 
+interface IUserRepository {
+    suspend fun getUserDetail(id: Long): UserDetailRead
+
+    suspend fun createUser(detail: UserDetailCreate): UserDetailRead
+
+    suspend fun updateUser(detail: UserDetailUpdate): UserDetailRead
+}
+
 internal class UserRepository(private val db: ChoreServiceDatabase, private val logger: Logger) :
-    IChoreServiceUserRepository {
+    IUserRepository {
     override suspend fun getUserDetail(id: Long): UserDetailRead {
         return db.userDao().getUserById(id).toReadUser()
     }

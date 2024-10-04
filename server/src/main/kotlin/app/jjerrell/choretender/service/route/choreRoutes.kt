@@ -21,7 +21,7 @@ import app.jjerrell.choretender.service.PARAM_CHORE_ID
 import app.jjerrell.choretender.service.PARAM_FAMILY_ID
 import app.jjerrell.choretender.service.domain.model.chore.ChoreDetailCreate
 import app.jjerrell.choretender.service.domain.model.chore.ChoreDetailUpdate
-import app.jjerrell.choretender.service.domain.repository.IChoreServiceChoreRepository
+import app.jjerrell.choretender.service.domain.repository.IChoreRepository
 import io.ktor.http.*
 import io.ktor.server.application.*
 import io.ktor.server.request.*
@@ -30,7 +30,7 @@ import io.ktor.server.routing.*
 import org.koin.ktor.ext.inject
 
 internal fun Route.choreRoutes() {
-    val choreRepository by inject<IChoreServiceChoreRepository>()
+    val choreRepository by inject<IChoreRepository>()
 
     route("family/{$PARAM_FAMILY_ID}/chore") {
         get {

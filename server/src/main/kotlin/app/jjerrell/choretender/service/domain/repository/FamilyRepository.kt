@@ -27,8 +27,22 @@ import io.ktor.server.plugins.*
 import io.ktor.util.logging.*
 import kotlinx.datetime.Clock
 
+interface IFamilyRepository {
+    suspend fun getFamilyDetail(id: Long): FamilyDetailRead
+
+    suspend fun createFamily(detail: FamilyDetailCreate): FamilyDetailRead
+
+    suspend fun inviteFamilyMember(familyId: Long, detail: FamilyDetailInvite): FamilyDetailRead
+
+    suspend fun verifyFamilyMember(familyId: Long, detail: FamilyMemberVerify): FamilyDetailRead
+
+    suspend fun changeMemberRole(familyId: Long, detail: FamilyMemberChangeRole): FamilyDetailRead
+
+    suspend fun leaveFamilyGroup(familyId: Long, detail: FamilyMemberLeave): FamilyDetailRead
+}
+
 internal class FamilyRepository(private val db: ChoreServiceDatabase, private val logger: Logger) :
-    IChoreServiceFamilyRepository {
+    IFamilyRepository {
     override suspend fun getFamilyDetail(id: Long): FamilyDetailRead {
         return db.familyDao().getFamilyWithMembers(familyId = id).toFamilyDetail()
     }

@@ -19,7 +19,7 @@ package app.jjerrell.choretender.service.route
 
 import app.jjerrell.choretender.service.domain.model.user.UserDetailCreate
 import app.jjerrell.choretender.service.domain.model.user.UserDetailUpdate
-import app.jjerrell.choretender.service.domain.repository.IChoreServiceUserRepository
+import app.jjerrell.choretender.service.domain.repository.IUserRepository
 import io.ktor.http.*
 import io.ktor.server.application.*
 import io.ktor.server.plugins.*
@@ -30,7 +30,7 @@ import io.ktor.server.routing.*
 import org.koin.ktor.ext.inject
 
 internal fun Route.userRoutes() {
-    val userRepository by inject<IChoreServiceUserRepository>()
+    val userRepository by inject<IUserRepository>()
 
     route("user") {
         get("{id?}") {

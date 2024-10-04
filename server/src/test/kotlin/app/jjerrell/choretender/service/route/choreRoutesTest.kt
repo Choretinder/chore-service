@@ -18,7 +18,7 @@
 package app.jjerrell.choretender.service.route
 
 import app.jjerrell.choretender.service.domain.model.chore.ChoreDetailRead
-import app.jjerrell.choretender.service.domain.repository.IChoreServiceChoreRepository
+import app.jjerrell.choretender.service.domain.repository.IChoreRepository
 import app.jjerrell.choretender.service.setupPlugins
 import app.jjerrell.choretender.service.setupRouting
 import app.jjerrell.choretender.service.util.TestData
@@ -129,7 +129,7 @@ class ChoreRoutesTest {
             install(Koin) {
                 modules(
                     module {
-                        factory<IChoreServiceChoreRepository> {
+                        factory<IChoreRepository> {
                             mockk {
                                 coEvery { getFamilyChoreDetails(familyId = 1) } returns
                                     listOf(TestData.choreDetailReadOne, TestData.choreDetailReadTwo)
@@ -157,7 +157,7 @@ class ChoreRoutesTest {
             install(Koin) {
                 modules(
                     module {
-                        factory<IChoreServiceChoreRepository> {
+                        factory<IChoreRepository> {
                             mockk {
                                 coEvery { getChoreDetail(familyId = 1, choreId = 1) } returns
                                     TestData.choreDetailReadOne
@@ -182,7 +182,7 @@ class ChoreRoutesTest {
             install(Koin) {
                 modules(
                     module {
-                        factory<IChoreServiceChoreRepository> {
+                        factory<IChoreRepository> {
                             mockk {
                                 coEvery {
                                     createChore(familyId = 1, detail = TestData.choreDetailCreate)
@@ -212,7 +212,7 @@ class ChoreRoutesTest {
             install(Koin) {
                 modules(
                     module {
-                        factory<IChoreServiceChoreRepository> {
+                        factory<IChoreRepository> {
                             mockk {
                                 coEvery {
                                     updateChore(familyId = 1, detail = TestData.choreDetailUpdate)
