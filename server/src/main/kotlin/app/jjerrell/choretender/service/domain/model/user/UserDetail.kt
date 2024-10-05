@@ -31,7 +31,7 @@ data class UserDetailCreate(
     val type: UserType,
     val contactInfo: ContactInfo?,
     val createdBy: Long,
-    val createdDate: Long = Clock.System.now().epochSeconds
+    val createdDate: Long = Clock.System.now().toEpochMilliseconds()
 )
 
 @Serializable
@@ -52,6 +52,6 @@ data class UserDetailUpdate(
     val name: String? = null,
     val type: UserType? = null,
     val contactInfo: ContactInfo? = null,
-    val updatedDate: Long = Clock.System.now().epochSeconds,
+    val updatedDate: Long = Clock.System.now().toEpochMilliseconds(),
     val updatedBy: Long
 )

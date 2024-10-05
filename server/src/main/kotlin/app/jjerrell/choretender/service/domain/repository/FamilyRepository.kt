@@ -70,7 +70,7 @@ internal class FamilyRepository(private val db: ChoreServiceDatabase, private va
                     role = UserType.MANAGER.name,
                     isConfirmed = true,
                     invitedBy = 0,
-                    invitedDate = Clock.System.now().epochSeconds
+                    invitedDate = Clock.System.now().toEpochMilliseconds()
                 )
             )
 
@@ -105,7 +105,7 @@ internal class FamilyRepository(private val db: ChoreServiceDatabase, private va
                         role = UserType.STANDARD.name,
                         isConfirmed = false,
                         invitedBy = detail.invitedBy,
-                        invitedDate = Clock.System.now().epochSeconds
+                        invitedDate = Clock.System.now().toEpochMilliseconds()
                     )
                 )
         }

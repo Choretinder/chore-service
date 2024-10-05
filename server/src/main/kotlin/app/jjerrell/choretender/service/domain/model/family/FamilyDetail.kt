@@ -37,7 +37,7 @@ data class FamilyDetailCreate(
     val name: String,
     val invitees: List<Long>? = null,
     val createdBy: Long,
-    val createdDate: Long = Clock.System.now().epochSeconds
+    val createdDate: Long = Clock.System.now().toEpochMilliseconds()
 )
 
 @Serializable data class FamilyDetailInvite(val inviteeId: Long, val invitedBy: Long)

@@ -39,7 +39,7 @@ enum class ChoreCompletion {
 data class ChoreDetailCreate(
     val name: String,
     val recurrence: ChoreRecurrence = ChoreRecurrence.NONE,
-    val createdDate: Long = Clock.System.now().epochSeconds,
+    val createdDate: Long = Clock.System.now().toEpochMilliseconds(),
     val createdBy: Long,
     val endDate: Long? = null,
 )
@@ -64,6 +64,6 @@ data class ChoreDetailUpdate(
     val recurrence: ChoreRecurrence? = null,
     val endDate: Long? = null,
     val status: ChoreCompletion? = null,
-    val updatedDate: Long = Clock.System.now().epochSeconds,
+    val updatedDate: Long = Clock.System.now().toEpochMilliseconds(),
     val updatedBy: Long
 )
