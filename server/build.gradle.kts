@@ -15,7 +15,7 @@ version = "1.0.0"
 application {
     mainClass.set("app.jjerrell.choretender.service.ApplicationKt")
     applicationDefaultJvmArgs =
-        listOf("-Dio.ktor.development=${extra["io.ktor.development"] ?: "false"}")
+        listOf("-Dio.ktor.development=true") //${extra["io.ktor.development"] ?: "false"}")
 }
 
 dependencies {
@@ -48,15 +48,16 @@ dependencies {
     implementation(libs.kotlinx.datetime)
 
     // Testing
-    testImplementation(libs.ktor.server.tests)
-    testImplementation("io.ktor:ktor-client-core:2.3.12")
-    testImplementation("io.ktor:ktor-client-cio:2.3.12")
-    testImplementation("io.ktor:ktor-client-content-negotiation:2.3.12")
-    testImplementation("org.jetbrains.kotlinx:kotlinx-coroutines-test:1.9.0")
     testImplementation(libs.kotlin.test.junit)
-    testImplementation("io.mockk:mockk:1.13.12")
-    testImplementation("io.insert-koin:koin-test:3.5.3")
-    testImplementation("io.insert-koin:koin-test-junit4:3.5.3")
+    testImplementation(libs.kotlin.test.coroutines)
+    testImplementation(libs.mockk)
+
+    testImplementation(libs.ktor.server.tests)
+    testImplementation(libs.ktor.client.core)
+    testImplementation(libs.ktor.client.content.negotiation)
+
+    testImplementation(libs.koin.test.core)
+    testImplementation(libs.koin.test.junit)
 }
 
 room { schemaDirectory("$projectDir/schemas") }
