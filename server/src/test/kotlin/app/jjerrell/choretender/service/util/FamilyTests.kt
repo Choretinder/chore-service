@@ -103,7 +103,8 @@ abstract class FamilyTests {
             inviteeUserId = inviteeUser.id,
             familyId = familyRead.id,
             managerMemberId = familyRead.members.find { it.id == managerUser.id }?.memberId!!,
-            inviteeMemberId = inviteeMemberRead.id,
+            inviteeMemberId =
+                inviteeMemberRead.members.find { it.id == inviteeUser.id }?.memberId!!,
             choreId = createChore().id
         )
     }

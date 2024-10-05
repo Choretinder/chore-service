@@ -34,7 +34,7 @@ import kotlinx.coroutines.Dispatchers
             FamilyEntity::class,
             FamilyMemberEntity::class,
             ChoreEntity::class,
-            ChoreAssignment::class
+            ChoreAssignmentEntity::class
         ],
     version = 2
 )

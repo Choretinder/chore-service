@@ -38,7 +38,7 @@ import androidx.room.*
         ],
     indices = [Index(value = ["assigneeId"]), Index(value = ["choreId"])]
 )
-data class ChoreAssignment(
+data class ChoreAssignmentEntity(
     @PrimaryKey(autoGenerate = true) val assignmentId: Long = 0,
     val assigneeId: Long,
     val choreId: Long,
@@ -48,14 +48,14 @@ data class ChoreAssignment(
 )
 
 data class ChoreAssignmentWithChore(
-    @Embedded val assignment: ChoreAssignment,
+    @Embedded val assignment: ChoreAssignmentEntity,
     @Relation(parentColumn = "choreId", entityColumn = "choreId") val chore: ChoreEntity
 )
 
 data class FamilyMemberWithAssignments(
     @Embedded val member: FamilyMemberEntity,
     @Relation(
-        entity = ChoreAssignment::class,
+        entity = ChoreAssignmentEntity::class,
         parentColumn = "memberId",
         entityColumn = "assigneeId"
     )

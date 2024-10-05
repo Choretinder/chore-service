@@ -17,7 +17,7 @@
  */
 package app.jjerrell.choretender.service.database.dao
 
-import app.jjerrell.choretender.service.database.entity.ChoreAssignment
+import app.jjerrell.choretender.service.database.entity.ChoreAssignmentEntity
 import app.jjerrell.choretender.service.domain.model.chore.ChoreCompletion
 import app.jjerrell.choretender.service.util.FamilyTests
 import kotlin.test.*
@@ -29,14 +29,14 @@ class ChoreAssignmentDaoTest : FamilyTests() {
     fun testInsertChoreAssignment() = runTest {
         // Arrange
         val testFamilyDetail = setupTestFamily()
-        val systemTime = Clock.System.now().epochSeconds
+        val systemTime = Clock.System.now().toEpochMilliseconds()
 
         // Act
         val assignmentId =
             db.choreAssignmentDao()
                 .insertAssignment(
                     assignment =
-                        ChoreAssignment(
+                        ChoreAssignmentEntity(
                             assigneeId = testFamilyDetail.managerMemberId,
                             choreId = testFamilyDetail.choreId,
                             assignmentStatus = ChoreCompletion.NONE.name,
@@ -66,11 +66,11 @@ class ChoreAssignmentDaoTest : FamilyTests() {
             db.choreAssignmentDao()
                 .insertAssignment(
                     assignment =
-                        ChoreAssignment(
+                        ChoreAssignmentEntity(
                             assigneeId = testFamilyDetail.managerMemberId,
                             choreId = testFamilyDetail.choreId,
                             assignmentStatus = ChoreCompletion.NONE.name,
-                            assignmentDate = systemTime.epochSeconds
+                            assignmentDate = systemTime.toEpochMilliseconds()
                         )
                 )
         val memberWithAssignments =
@@ -85,7 +85,7 @@ class ChoreAssignmentDaoTest : FamilyTests() {
                 .updateAssignment(
                     createdAssignment.copy(
                         assignmentStatus = ChoreCompletion.VERIFY.name,
-                        statusDate = updatedTime.epochSeconds
+                        statusDate = updatedTime.toEpochMilliseconds()
                     )
                 )
 
@@ -103,11 +103,11 @@ class ChoreAssignmentDaoTest : FamilyTests() {
         val updateAssignmentResult =
             db.choreAssignmentDao()
                 .updateAssignment(
-                    ChoreAssignment(
+                    ChoreAssignmentEntity(
                         assigneeId = testFamilyDetail.managerMemberId,
                         choreId = testFamilyDetail.choreId,
                         assignmentStatus = ChoreCompletion.NONE.name,
-                        assignmentDate = systemTime.epochSeconds
+                        assignmentDate = systemTime.toEpochMilliseconds()
                     )
                 )
 
@@ -125,11 +125,11 @@ class ChoreAssignmentDaoTest : FamilyTests() {
             db.choreAssignmentDao()
                 .insertAssignment(
                     assignment =
-                        ChoreAssignment(
+                        ChoreAssignmentEntity(
                             assigneeId = testFamilyDetail.managerMemberId,
                             choreId = testFamilyDetail.choreId,
                             assignmentStatus = ChoreCompletion.NONE.name,
-                            assignmentDate = systemTime.epochSeconds
+                            assignmentDate = systemTime.toEpochMilliseconds()
                         )
                 )
         val memberWithAssignments =
@@ -154,11 +154,11 @@ class ChoreAssignmentDaoTest : FamilyTests() {
         val removeAssignmentResult =
             db.choreAssignmentDao()
                 .removeAssignment(
-                    ChoreAssignment(
+                    ChoreAssignmentEntity(
                         assigneeId = testFamilyDetail.managerMemberId,
                         choreId = testFamilyDetail.choreId,
                         assignmentStatus = ChoreCompletion.NONE.name,
-                        assignmentDate = systemTime.epochSeconds
+                        assignmentDate = systemTime.toEpochMilliseconds()
                     )
                 )
 

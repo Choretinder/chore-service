@@ -18,17 +18,24 @@
 package app.jjerrell.choretender.service.database.dao
 
 import androidx.room.*
-import app.jjerrell.choretender.service.database.entity.ChoreAssignment
+import app.jjerrell.choretender.service.database.entity.ChoreAssignmentEntity
+import app.jjerrell.choretender.service.database.entity.ChoreAssignmentWithChore
 import app.jjerrell.choretender.service.database.entity.FamilyMemberWithAssignments
 
 @Dao
 interface ChoreAssignmentDao {
     @Insert(onConflict = OnConflictStrategy.REPLACE)
-    suspend fun insertAssignment(assignment: ChoreAssignment): Long
+    suspend fun insertAssignment(assignment: ChoreAssignmentEntity): Long
 
-    @Update suspend fun updateAssignment(assignment: ChoreAssignment): Int
+    @Update suspend fun updateAssignment(assignment: ChoreAssignmentEntity): Int
 
-    @Delete suspend fun removeAssignment(assignment: ChoreAssignment): Int
+    @Delete suspend fun removeAssignment(assignment: ChoreAssignmentEntity): Int
+
+    @Query("SELECT * FROM chore_assignment WHERE assignmentId = :assignmentId")
+    suspend fun getAssignmentById(assignmentId: Long): ChoreAssignmentWithChore
+
+    @Query("SELECT * FROM chore_assignment WHERE choreId = :choreId")
+    suspend fun getExistingAssignment(choreId: Long): ChoreAssignmentWithChore
 
     @Transaction
     @Query("SELECT * FROM family_member WHERE memberId = :assigneeId")
