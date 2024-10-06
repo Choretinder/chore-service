@@ -15,7 +15,7 @@ version = "1.0.0"
 application {
     mainClass.set("app.jjerrell.choretender.service.ApplicationKt")
     applicationDefaultJvmArgs =
-        listOf("-Dio.ktor.development=true") //${extra["io.ktor.development"] ?: "false"}")
+        listOf("-Dio.ktor.development=true") // ${extra["io.ktor.development"] ?: "false"}")
 }
 
 dependencies {

@@ -31,9 +31,11 @@ interface ChoreAssignmentDao {
 
     @Delete suspend fun removeAssignment(assignment: ChoreAssignmentEntity): Int
 
+    @Transaction
     @Query("SELECT * FROM chore_assignment WHERE assignmentId = :assignmentId")
     suspend fun getAssignmentById(assignmentId: Long): ChoreAssignmentWithChore
 
+    @Transaction
     @Query("SELECT * FROM chore_assignment WHERE choreId = :choreId")
     suspend fun getExistingAssignment(choreId: Long): ChoreAssignmentWithChore
 
