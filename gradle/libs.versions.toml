@@ -1,5 +1,4 @@
 [versions]
-junit = "4.13.2"
 kotlin = "2.0.20"
 ksp = "2.0.20-1.0.25"
 ktor = "2.3.12"
