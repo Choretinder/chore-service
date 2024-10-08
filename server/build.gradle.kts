@@ -20,6 +20,8 @@ application {
 
 dependencies {
     // Ktor Core
+    implementation(libs.ktor.client.core)
+    implementation(libs.ktor.client.cio)
     implementation(libs.ktor.server.core)
     implementation(libs.ktor.server.netty)
     implementation(libs.ktor.utils)
@@ -31,6 +33,7 @@ dependencies {
 
     // Content Negotiation
     implementation(libs.ktor.server.content.negotiation)
+    implementation(libs.ktor.client.content.negotiation)
     implementation(libs.ktor.server.json)
 
     // DI
@@ -53,8 +56,6 @@ dependencies {
     testImplementation(libs.mockk)
 
     testImplementation(libs.ktor.server.tests)
-    testImplementation(libs.ktor.client.core)
-    testImplementation(libs.ktor.client.content.negotiation)
 
     testImplementation(libs.koin.test.core)
     testImplementation(libs.koin.test.junit)

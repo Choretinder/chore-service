@@ -17,7 +17,18 @@
  */
 package app.jjerrell.choretender.service
 
-const val SERVER_PORT = 8080
+data object DefaultConfig {
+    const val SERVER_PORT = 8080
+}
 
-const val PARAM_FAMILY_ID = "familyId"
-const val PARAM_CHORE_ID = "choreId"
+data object RouteParams {
+    const val PARAM_FAMILY_ID = "familyId"
+    const val PARAM_CHORE_ID = "choreId"
+}
+
+data object AuthData {
+    const val CLIENT_ID = "GOOGLE_CLIENT_ID"
+    const val CLIENT_SECRET = "GOOGLE_CLIENT_SECRET"
+
+    const val REDIRECT_PARAM = "redirectUrl"
+}

@@ -17,7 +17,7 @@
  */
 package app.jjerrell.choretender.service.route
 
-import app.jjerrell.choretender.service.PARAM_FAMILY_ID
+import app.jjerrell.choretender.service.RouteParams
 import app.jjerrell.choretender.service.domain.model.family.*
 import app.jjerrell.choretender.service.domain.repository.IFamilyRepository
 import io.ktor.http.*
@@ -42,10 +42,10 @@ internal fun Route.familyRoutes() {
                 call.respond(HttpStatusCode.InternalServerError)
             }
         }
-        route("{$PARAM_FAMILY_ID}") {
+        route("{${RouteParams.PARAM_FAMILY_ID}}") {
             get {
                 try {
-                    call.parameters[PARAM_FAMILY_ID]?.toLongOrNull()?.let {
+                    call.parameters[RouteParams.PARAM_FAMILY_ID]?.toLongOrNull()?.let {
                         val familyLookup = familyRepository.getFamilyDetail(it)
                         call.respond(familyLookup)
                     }
@@ -56,7 +56,7 @@ internal fun Route.familyRoutes() {
             }
             post("invite") {
                 try {
-                    call.parameters[PARAM_FAMILY_ID]?.toLongOrNull()?.let {
+                    call.parameters[RouteParams.PARAM_FAMILY_ID]?.toLongOrNull()?.let {
                         val familyInviteBody = call.receive<FamilyDetailInvite>()
                         val updatedFamily =
                             familyRepository.inviteFamilyMember(it, familyInviteBody)
@@ -71,7 +71,7 @@ internal fun Route.familyRoutes() {
             }
             post("leave") {
                 try {
-                    call.parameters[PARAM_FAMILY_ID]?.toLongOrNull()?.let {
+                    call.parameters[RouteParams.PARAM_FAMILY_ID]?.toLongOrNull()?.let {
                         val familyLeaveBody = call.receive<FamilyMemberLeave>()
                         val updatedFamily = familyRepository.leaveFamilyGroup(it, familyLeaveBody)
                         call.respond(updatedFamily)
@@ -85,7 +85,7 @@ internal fun Route.familyRoutes() {
             }
             post("verify") {
                 try {
-                    call.parameters[PARAM_FAMILY_ID]?.toLongOrNull()?.let {
+                    call.parameters[RouteParams.PARAM_FAMILY_ID]?.toLongOrNull()?.let {
                         val familyVerifyBody = call.receive<FamilyMemberVerify>()
                         val updatedFamily =
                             familyRepository.verifyFamilyMember(it, familyVerifyBody)
@@ -100,7 +100,7 @@ internal fun Route.familyRoutes() {
             }
             post("role") {
                 try {
-                    call.parameters[PARAM_FAMILY_ID]?.toLongOrNull()?.let {
+                    call.parameters[RouteParams.PARAM_FAMILY_ID]?.toLongOrNull()?.let {
                         val familyMemberRoleBody = call.receive<FamilyMemberChangeRole>()
                         val updatedFamily =
                             familyRepository.changeMemberRole(it, familyMemberRoleBody)

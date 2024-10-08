@@ -17,8 +17,7 @@
  */
 package app.jjerrell.choretender.service.route
 
-import app.jjerrell.choretender.service.PARAM_CHORE_ID
-import app.jjerrell.choretender.service.PARAM_FAMILY_ID
+import app.jjerrell.choretender.service.RouteParams
 import app.jjerrell.choretender.service.domain.model.chore.ChoreDetailCreate
 import app.jjerrell.choretender.service.domain.model.chore.ChoreDetailUpdate
 import app.jjerrell.choretender.service.domain.repository.IChoreRepository
@@ -32,10 +31,10 @@ import org.koin.ktor.ext.inject
 internal fun Route.choreRoutes() {
     val choreRepository by inject<IChoreRepository>()
 
-    route("family/{$PARAM_FAMILY_ID}/chore") {
+    route("family/{${RouteParams.PARAM_FAMILY_ID}}/chore") {
         get {
             try {
-                call.parameters[PARAM_FAMILY_ID]?.toLongOrNull()?.let {
+                call.parameters[RouteParams.PARAM_FAMILY_ID]?.toLongOrNull()?.let {
                     val familyChores = choreRepository.getFamilyChoreDetails(it)
                     call.respond(familyChores)
                 }
@@ -45,10 +44,10 @@ internal fun Route.choreRoutes() {
             }
         }
 
-        get("{$PARAM_CHORE_ID}") {
+        get("{${RouteParams.PARAM_CHORE_ID}}") {
             try {
-                call.parameters[PARAM_FAMILY_ID]?.toLongOrNull()?.let { familyId ->
-                    call.parameters[PARAM_CHORE_ID]?.toLongOrNull()?.let { choreId ->
+                call.parameters[RouteParams.PARAM_FAMILY_ID]?.toLongOrNull()?.let { familyId ->
+                    call.parameters[RouteParams.PARAM_CHORE_ID]?.toLongOrNull()?.let { choreId ->
                         call.respond(
                             choreRepository.getChoreDetail(familyId = familyId, choreId = choreId)
                         )
@@ -67,7 +66,7 @@ internal fun Route.choreRoutes() {
 
         post {
             try {
-                call.parameters[PARAM_FAMILY_ID]?.toLongOrNull()?.let { familyId ->
+                call.parameters[RouteParams.PARAM_FAMILY_ID]?.toLongOrNull()?.let { familyId ->
                     val choreCreateBody = call.receive<ChoreDetailCreate>()
                     call.respond(choreRepository.createChore(familyId, choreCreateBody))
                 }
@@ -81,7 +80,7 @@ internal fun Route.choreRoutes() {
 
         post("update") {
             try {
-                call.parameters[PARAM_FAMILY_ID]?.toLongOrNull()?.let { familyId ->
+                call.parameters[RouteParams.PARAM_FAMILY_ID]?.toLongOrNull()?.let { familyId ->
                     val choreUpdateBody = call.receive<ChoreDetailUpdate>()
                     call.respond(choreRepository.updateChore(familyId, choreUpdateBody))
                 }
