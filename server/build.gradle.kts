@@ -25,6 +25,7 @@ dependencies {
     implementation(libs.ktor.server.core)
     implementation(libs.ktor.server.netty)
     implementation(libs.ktor.utils)
+    implementation(libs.ktor.logging)
     implementation(libs.logback)
 
     // Auth & Sessions
